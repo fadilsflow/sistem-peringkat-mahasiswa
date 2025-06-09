@@ -80,7 +80,7 @@ export function HasilSawContent({ periodeId }: { periodeId: string }) {
 
   useEffect(() => {
     console.log(periodeId);
-  }, []);
+  }, [periodeId]);
 
   useEffect(() => {
     const fetchData = async () => {

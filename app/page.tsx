@@ -1,4 +1,6 @@
 import { Button } from "@/components/ui/button";
+import { ArrowUpRight, CheckCircle2, XCircle } from "lucide-react";
+
 import Link from "next/link";
 export default function Home() {
   const Timeline = [
@@ -41,12 +43,10 @@ export default function Home() {
   return (
     <div className="container max-w-3xl px-4 py-12 mx-auto">
       <h1 className="text-5xl  text-primary uppercase font-light">
-        Welcome to
-        <br />
         <span className="font-light">Sync</span>{" "}
         <span className="font-medium">Rank</span>
       </h1>
-      <p className="text-muted-foreground  text-sm">
+      <p className="text-muted-foreground  text-sm ">
         Sistem Peringkat Mahasiswa (SyncRank) adalah platform yang dirancang
         untuk membantu institusi pendidikan dalam mengelola dan memantau
         prestasi akademik mahasiswa.
@@ -60,22 +60,38 @@ export default function Home() {
       </div>
 
       <div className="space-y-6">
-        <h2 className="text-2xl font-medium">Fitur Utama: </h2>
+        <h2 className="text-2xl font-light">Fitur Utama: </h2>
         {Timeline.map((item, index) => (
           <div
             key={index}
             className="flex flex-col gap-2 bg-card p-4 rounded-md"
           >
             <div className="flex items-center gap-2">
-              <div
-                className={`w-2 h-2 rounded-full ${item.isSuccess ? "bg-green-500" : "bg-red-500"}`}
-              />
-              <h2 className="text-2xl font-medium">{item.title}</h2>
+              {item.isSuccess ? (
+                <CheckCircle2 className="w-4 h-4 text-green-500" />
+              ) : (
+                <XCircle className="w-4 h-4 text-red-500" />
+              )}
+              <h2 className="text-xl font-light">{item.title}</h2>
             </div>
             <p className="text-muted-foreground text-sm">{item.description}</p>
           </div>
         ))}
       </div>
+      <p className="text-muted-foreground text-sm mt-4 text-left flex gap-2 relative">
+        <span className="absolute -left-3 top-0">*</span>
+        <span>
+          You can help us by contributing to the project or reporting issues
+          on{" "}
+        </span>
+        <a
+          href="https://github.com/fadilsflow/sistem-peringkat-mahasiswa"
+          className="link flex items-center gap-2"
+          target="_blank"
+        >
+          GitHub <ArrowUpRight className="w-4 h-4" />
+        </a>
+      </p>
     </div>
   );
 }

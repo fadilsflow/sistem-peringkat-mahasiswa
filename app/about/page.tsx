@@ -13,7 +13,8 @@ export default function About() {
           <h1 className="text-5xl text-center text-primary uppercase font-light">
             Tentang
             <br />
-            <span className="font-light">Sync</span> <span className="font-medium">Rank</span>
+            <span className="font-light">Sync</span>{" "}
+            <span className="font-medium">Rank</span>
           </h1>
 
           <div className="prose prose-gray dark:prose-invert max-w-none">
@@ -46,14 +47,14 @@ export default function About() {
 
             <h2 className="text-2xl mt-8 mb-4">Contact</h2>
             <div className="flex items-center gap-4 mt-4">
-              <Link href="https://fadils.xyz" target="_blank">
-                <Button variant="outline" size="sm">
+              <Button variant="outline" size="sm" asChild>
+                <Link href="https://fadils.xyz" target="_blank">
                   <Globe className="h-4 w-4 mr-2" />
                   fadils.xyz
-                </Button>
-              </Link>
-              <Link href="https://github.com/fadilsflow" target="_blank">
-                <Button variant="outline" size="sm">
+                </Link>
+              </Button>
+              <Button variant="outline" size="sm" asChild>
+                <Link href="https://github.com/fadilsflow" target="_blank">
                   <Image
                     src={"/github.svg"}
                     alt="GitHub"
@@ -62,8 +63,8 @@ export default function About() {
                     className="h-4 w-4 mr-2"
                   />
                   GitHub
-                </Button>
-              </Link>
+                </Link>
+              </Button>
             </div>
           </div>
         </div>

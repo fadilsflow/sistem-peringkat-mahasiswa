@@ -38,7 +38,11 @@ export function Header() {
             </nav>
           </div>
           <div className="flex gap-4 items-center">
-            <Link href="https://github.com/fadilsflow/sistem-peringkat-mahasiswa/">
+            <a
+              target="_blank"
+              rel="noopener noreferrer"
+              href="https://github.com/fadilsflow/sistem-peringkat-mahasiswa/"
+            >
               <Image
                 src="/github.svg"
                 alt="github"
@@ -46,7 +50,7 @@ export function Header() {
                 height={15}
                 className="invert"
               />
-            </Link>
+            </a>
             <Link href="/about">
               <Info className="w-4 h-4" />
             </Link>
