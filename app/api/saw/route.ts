@@ -3,7 +3,6 @@ import { Mahasiswa } from "@prisma/client";
 import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
-  
   try {
     const { searchParams } = new URL(request.url);
     const periodeId = searchParams.get("periode");
@@ -32,6 +31,21 @@ export async function GET(request: Request) {
     if (mahasiswa.length === 0) {
       return NextResponse.json([]);
     }
+    const totalWeight =
+      periode.w1_nilai_akademik +
+      periode.w2_kehadiran +
+      periode.w3_prestasi_akademik +
+      periode.w4_prestasi_nonakademik +
+      periode.w5_perilaku +
+      periode.w6_keaktifan_organisasi;
+    const weights = {
+      nilai_akademik: periode.w1_nilai_akademik / totalWeight,
+      kehadiran: periode.w2_kehadiran / totalWeight,
+      prestasi_akademik: periode.w3_prestasi_akademik / totalWeight,
+      prestasi_nonakademik: periode.w4_prestasi_nonakademik / totalWeight,
+      perilaku: periode.w5_perilaku / totalWeight,
+      keaktifan_organisasi: periode.w6_keaktifan_organisasi / totalWeight,
+    };
 
     // Get max values for normalization
     const maxValues = {
@@ -67,13 +81,13 @@ export async function GET(request: Request) {
 
       // Calculate final score
       const final_score =
-        normalized.nilai_akademik * periode.w1_nilai_akademik +
-        normalized.kehadiran * periode.w2_kehadiran +
-        normalized.prestasi_akademik * periode.w3_prestasi_akademik +
-        normalized.prestasi_nonakademik * periode.w4_prestasi_nonakademik +
-        normalized.perilaku * periode.w5_perilaku +
-        normalized.keaktifan_organisasi * periode.w6_keaktifan_organisasi;
-
+        normalized.nilai_akademik * weights.nilai_akademik +
+        normalized.kehadiran * weights.kehadiran +
+        normalized.prestasi_akademik * weights.prestasi_akademik +
+        normalized.prestasi_nonakademik * weights.prestasi_nonakademik +
+        normalized.perilaku * weights.perilaku +
+        normalized.keaktifan_organisasi * weights.keaktifan_organisasi;
+      console.log(final_score);
       return {
         ...m,
         final_score,
