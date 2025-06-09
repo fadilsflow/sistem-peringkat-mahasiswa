@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/header";
 import { Providers } from "./providers";
+import Footer from "@/components/footer";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -23,7 +24,10 @@ export default function RootLayout({
         <Providers>
           <div className="min-h-screen bg-background">
             <Header />
-            <main className="container mx-auto py-6 px-10 ">{children}</main>
+            <main className="container mx-auto py-6 px-4 sm:px-10 ">
+              {children}
+            </main>
+            <Footer />
           </div>
         </Providers>
       </body>

@@ -107,10 +107,10 @@ export function DashboardContent() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
+    <div className="space-y-6  md:p-0">
+      <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight text-primary">
+          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-primary">
             Dashboard
           </h2>
           <p className="text-muted-foreground text-sm">
@@ -118,7 +118,7 @@ export function DashboardContent() {
           </p>
         </div>
         <Select value={selectedPeriodeId} onValueChange={setSelectedPeriodeId}>
-          <SelectTrigger className="w-[200px] ">
+          <SelectTrigger className="w-full sm:w-[200px]">
             <Calendar className="mr-2 h-4 w-4" />
             <SelectValue placeholder="Pilih Periode" />
           </SelectTrigger>
@@ -132,7 +132,7 @@ export function DashboardContent() {
         </Select>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 grid-cols-2 sm:grid-cols-2 lg:grid-cols-4">
         {isStatsLoading ? (
           Array(4)
             .fill(0)
@@ -150,13 +150,13 @@ export function DashboardContent() {
           <>
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
+                <CardTitle className="text-xs md:text-sm font-medium">
                   Total Mahasiswa
                 </CardTitle>
                 <Users className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">
+                <div className="text-xl md:text-2xl font-bold">
                   {stats?.totalMahasiswa || 0}
                 </div>
                 <p className="text-xs text-muted-foreground">
@@ -166,13 +166,13 @@ export function DashboardContent() {
             </Card>
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
+                <CardTitle className="text-xs md:text-sm font-medium">
                   Rata-rata Nilai
                 </CardTitle>
                 <TrendingUp className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">
+                <div className="text-lg md:text-xl font-bold">
                   {stats?.avgNilaiAkademik?.toFixed(2) || "0.00"}
                 </div>
                 <Progress
@@ -183,13 +183,13 @@ export function DashboardContent() {
             </Card>
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
+                <CardTitle className="text-xs md:text-sm font-medium">
                   Rata-rata Kehadiran
                 </CardTitle>
                 <ArrowUp className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">
+                <div className="text-lg md:text-xl font-bold">
                   {stats?.avgKehadiran?.toFixed(2) || "0.00"}%
                 </div>
                 <Progress value={stats?.avgKehadiran || 0} className="mt-2" />
@@ -197,13 +197,13 @@ export function DashboardContent() {
             </Card>
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
+                <CardTitle className="text-xs md:text-sm font-medium">
                   Rata-rata Prestasi
                 </CardTitle>
                 <Award className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">
+                <div className="text-lg md:text-xl font-bold">
                   {stats?.avgPrestasi?.toFixed(2) || "0.00"}
                 </div>
                 <Progress value={stats?.avgPrestasi || 0} className="mt-2" />
@@ -213,11 +213,11 @@ export function DashboardContent() {
         )}
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
-        <Card>
+      <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
+        <Card className="w-full">
           <CardHeader>
-            <CardTitle>Bobot Kriteria</CardTitle>
-            <CardDescription>
+            <CardTitle className="text-lg md:text-xl">Bobot Kriteria</CardTitle>
+            <CardDescription className="text-sm">
               Bobot penilaian untuk periode {activePeriode.tahun} Semester{" "}
               {activePeriode.semester}
             </CardDescription>
@@ -278,16 +278,18 @@ export function DashboardContent() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="w-full">
           <CardHeader>
-            <CardTitle>Top 5 Mahasiswa</CardTitle>
-            <CardDescription>
+            <CardTitle className="text-lg md:text-xl">
+              Top 5 Mahasiswa
+            </CardTitle>
+            <CardDescription className="text-sm">
               Mahasiswa dengan nilai tertinggi berdasarkan perhitungan SAW
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="px-0 sm:px-6">
             {isStatsLoading ? (
-              <div className="space-y-2">
+              <div className="space-y-2 px-6">
                 {Array(5)
                   .fill(0)
                   .map((_, i) => (
@@ -298,45 +300,47 @@ export function DashboardContent() {
                   ))}
               </div>
             ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-[100px]">Peringkat</TableHead>
-                    <TableHead>NIM</TableHead>
-                    <TableHead>Nama</TableHead>
-                    <TableHead className="text-right">Nilai</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {topMahasiswa.map((mahasiswa, index) => (
-                    <TableRow key={mahasiswa.nim}>
-                      <TableCell>
-                        <Badge
-                          variant={
-                            index === 0
-                              ? "default"
-                              : index < 3
-                                ? "secondary"
-                                : "outline"
-                          }
-                          className="w-6 h-6 rounded-full flex items-center justify-center p-0"
-                        >
-                          {index + 1}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>{mahasiswa.nim}</TableCell>
-                      <TableCell className="font-medium">
-                        {mahasiswa.nama}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <span className="font-mono">
-                          {mahasiswa.finalScore.toFixed(4)}
-                        </span>
-                      </TableCell>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-[100px]">Peringkat</TableHead>
+                      <TableHead>NIM</TableHead>
+                      <TableHead>Nama</TableHead>
+                      <TableHead className="text-right">Nilai</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {topMahasiswa.map((mahasiswa, index) => (
+                      <TableRow key={mahasiswa.nim}>
+                        <TableCell>
+                          <Badge
+                            variant={
+                              index === 0
+                                ? "default"
+                                : index < 3
+                                  ? "secondary"
+                                  : "outline"
+                            }
+                            className="w-6 h-6 rounded-full flex items-center justify-center p-0"
+                          >
+                            {index + 1}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>{mahasiswa.nim}</TableCell>
+                        <TableCell className="font-medium">
+                          {mahasiswa.nama}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <span className="font-mono">
+                            {mahasiswa.finalScore.toFixed(4)}
+                          </span>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
             )}
           </CardContent>
         </Card>

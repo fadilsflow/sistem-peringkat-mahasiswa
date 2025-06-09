@@ -352,8 +352,10 @@ export function ManageContent() {
   return (
     <div className="space-y-8">
       <div>
-        <h2 className="text-3xl font-bold tracking-tight">Manajemen Data</h2>
-        <p className="text-muted-foreground mt-2">
+        <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-primary">
+          Manajemen Data
+        </h2>
+        <p className="text-muted-foreground mt-2 text-sm">
           Kelola data mahasiswa dan periode penilaian
         </p>
       </div>
