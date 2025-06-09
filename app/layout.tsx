@@ -23,7 +23,7 @@ export default function RootLayout({
         <Providers>
           <div className="min-h-screen bg-background">
             <Header />
-            <main className="container mx-auto py-6 px-10">{children}</main>
+            <main className="container mx-auto py-6 px-10 ">{children}</main>
           </div>
         </Providers>
       </body>
