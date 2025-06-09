@@ -250,10 +250,10 @@ export function MahasiswaContent() {
                 onOpenChange={setIsEditDialogOpen}
               >
                 <DialogTrigger asChild>
-                  <Button>
-                    <Plus className="mr-2 h-4 w-4" />
-                    Tambah Mahasiswa
-                  </Button>
+            <Button>
+              <Plus className="mr-2 h-4 w-4" />
+              Tambah Mahasiswa
+            </Button>
                 </DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
@@ -275,7 +275,7 @@ export function MahasiswaContent() {
                   />
                 </DialogContent>
               </Dialog>
-            </div>
+          </div>
           )}
         </CardHeader>
         <CardContent>

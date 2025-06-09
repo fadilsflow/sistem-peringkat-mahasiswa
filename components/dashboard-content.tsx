@@ -41,6 +41,7 @@ import {
   useMahasiswaByPeriode,
 } from "@/lib/hooks/use-queries";
 import { getRanking } from "@/lib/utils/saw";
+import { HasilSawContent } from "./hasil-saw-content";
 
 export function DashboardContent() {
   const [selectedPeriodeId, setSelectedPeriodeId] = useState<string>("");
@@ -109,13 +110,15 @@ export function DashboardContent() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
-          <p className="text-muted-foreground">
+          <h2 className="text-3xl font-bold tracking-tight text-primary">
+            Dashboard
+          </h2>
+          <p className="text-muted-foreground text-sm">
             Ringkasan data dan statistik mahasiswa
           </p>
         </div>
         <Select value={selectedPeriodeId} onValueChange={setSelectedPeriodeId}>
-          <SelectTrigger className="w-[200px]">
+          <SelectTrigger className="w-[200px] ">
             <Calendar className="mr-2 h-4 w-4" />
             <SelectValue placeholder="Pilih Periode" />
           </SelectTrigger>
@@ -313,8 +316,8 @@ export function DashboardContent() {
                             index === 0
                               ? "default"
                               : index < 3
-                              ? "secondary"
-                              : "outline"
+                                ? "secondary"
+                                : "outline"
                           }
                           className="w-6 h-6 rounded-full flex items-center justify-center p-0"
                         >
@@ -338,6 +341,7 @@ export function DashboardContent() {
           </CardContent>
         </Card>
       </div>
+      <HasilSawContent />
     </div>
   );
 }

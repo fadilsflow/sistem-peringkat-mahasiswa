@@ -155,7 +155,13 @@ export function HasilSawContent() {
         </div>
       </CardHeader>
       <CardContent>
-        <DataTable columns={columns} data={data} />
+        <DataTable
+          columns={columns}
+          data={data}
+          filterColumn="nama"
+          filterPlaceholder="Cari Nama"
+          key={selectedPeriode}
+        />
       </CardContent>
     </Card>
   );

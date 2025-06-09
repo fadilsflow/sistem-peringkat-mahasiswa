@@ -25,7 +25,6 @@ import {
   Plus,
   Upload,
   Download,
-  School,
   MoreHorizontal,
   Loader2,
 } from "lucide-react";

@@ -151,7 +151,7 @@ export function PeriodeContent() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between">
         <h2 className="text-3xl font-bold tracking-tight">Manajemen Periode</h2>
         <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
           <DialogTrigger asChild>
@@ -177,7 +177,7 @@ export function PeriodeContent() {
             />
           </DialogContent>
         </Dialog>
-      </div>
+          </div>
 
       {periodeList.length === 0 ? (
         <Card>
@@ -196,16 +196,16 @@ export function PeriodeContent() {
             <CardDescription>
               Daftar periode yang tersedia dalam sistem
             </CardDescription>
-          </CardHeader>
-          <CardContent>
+        </CardHeader>
+        <CardContent>
             <DataTable
               columns={columns}
               data={periodeList}
               filterColumn="id_periode"
               filterPlaceholder="Filter ID periode..."
             />
-          </CardContent>
-        </Card>
+        </CardContent>
+      </Card>
       )}
 
       {/* Delete Confirmation Dialog */}

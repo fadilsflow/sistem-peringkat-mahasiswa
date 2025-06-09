@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { ThemeProvider } from "@/components/theme-provider";
 import { Header } from "@/components/header";
 import { Providers } from "./providers";
 
@@ -19,21 +18,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en">
       <body className={inter.className}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <Providers>
-            <div className="min-h-screen bg-background">
-              <Header />
-              <main className="container mx-auto py-6 px-4">{children}</main>
-            </div>
-          </Providers>
-        </ThemeProvider>
+        <Providers>
+          <div className="min-h-screen bg-background">
+            <Header />
+            <main className="container mx-auto py-6 px-10">{children}</main>
+          </div>
+        </Providers>
       </body>
     </html>
   );
