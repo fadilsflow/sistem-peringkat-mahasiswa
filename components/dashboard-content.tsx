@@ -341,7 +341,7 @@ export function DashboardContent() {
           </CardContent>
         </Card>
       </div>
-      <HasilSawContent />
+      <HasilSawContent periodeId={selectedPeriodeId} />
     </div>
   );
 }

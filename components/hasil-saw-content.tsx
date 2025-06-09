@@ -5,13 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { DataTable } from "./data-table";
 import { ColumnDef } from "@tanstack/react-table";
 import { Loader2 } from "lucide-react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "./ui/select";
+
 
 interface HasilSAW {
   nim: string;
@@ -26,12 +20,7 @@ interface HasilSAW {
   rank: number;
 }
 
-interface Periode {
-  id_periode: string;
-  tahun: string;
-  semester: number;
-  deskripsi: string;
-}
+
 
 const columns: ColumnDef<HasilSAW>[] = [
   {
@@ -39,7 +28,7 @@ const columns: ColumnDef<HasilSAW>[] = [
     header: "Peringkat",
   },
   {
-    accessorKey: "nim",
+    accessorKey: "nim", 
     header: "NIM",
   },
   {
@@ -85,36 +74,21 @@ const columns: ColumnDef<HasilSAW>[] = [
   },
 ];
 
-export function HasilSawContent() {
+export function HasilSawContent({ periodeId }: { periodeId: string }) {
   const [data, setData] = useState<HasilSAW[]>([]);
   const [loading, setLoading] = useState(true);
-  const [periodes, setPeriodes] = useState<Periode[]>([]);
-  const [selectedPeriode, setSelectedPeriode] = useState<string>("");
 
   useEffect(() => {
-    const fetchPeriodes = async () => {
-      try {
-        const response = await fetch("/api/periode");
-        const data = await response.json();
-        setPeriodes(data);
-        if (data.length > 0) {
-          setSelectedPeriode(data[0].id_periode);
-        }
-      } catch (error) {
-        console.error("Error fetching periodes:", error);
-      }
-    };
-
-    fetchPeriodes();
+    console.log(periodeId);
   }, []);
 
   useEffect(() => {
     const fetchData = async () => {
-      if (!selectedPeriode) return;
+      if (!periodeId) return;
 
       setLoading(true);
       try {
-        const response = await fetch(`/api/saw?periode=${selectedPeriode}`);
+        const response = await fetch(`/api/saw?periode=${periodeId}`);
         const data = await response.json();
         setData(data);
       } catch (error) {
@@ -125,7 +99,7 @@ export function HasilSawContent() {
     };
 
     fetchData();
-  }, [selectedPeriode]);
+  }, [periodeId]);
 
   if (loading) {
     return (
@@ -140,18 +114,6 @@ export function HasilSawContent() {
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle>Hasil Perhitungan SAW</CardTitle>
-          <Select value={selectedPeriode} onValueChange={setSelectedPeriode}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Pilih Periode" />
-            </SelectTrigger>
-            <SelectContent>
-              {periodes.map((periode) => (
-                <SelectItem key={periode.id_periode} value={periode.id_periode}>
-                  {periode.tahun} Semester {periode.semester}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
         </div>
       </CardHeader>
       <CardContent>
@@ -160,7 +122,7 @@ export function HasilSawContent() {
           data={data}
           filterColumn="nama"
           filterPlaceholder="Cari Nama"
-          key={selectedPeriode}
+          key={periodeId}
         />
       </CardContent>
     </Card>
