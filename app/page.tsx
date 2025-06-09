@@ -1,13 +1,5 @@
-import { DashboardContent } from "@/components/dashboard-content";
-import { MahasiswaContent } from "@/components/mahasiswa-content";
-import { PeriodeContent } from "@/components/periode-content";
+import { redirect } from "next/navigation";
 
 export default function Home() {
-  return (
-    <div className="flex flex-col">
-      <DashboardContent />
-      <MahasiswaContent />
-      <PeriodeContent />
-    </div>
-  );
+  redirect("/dashboard");
 }

@@ -1,171 +1,162 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { DataTable } from "./data-table";
+import { ColumnDef } from "@tanstack/react-table";
+import { Loader2 } from "lucide-react";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-import { Download, Search, Trophy } from "lucide-react";
+} from "./ui/select";
 
-const hasilSawData = [
+interface HasilSAW {
+  nim: string;
+  nama: string;
+  nilai_akademik: number;
+  kehadiran: number;
+  prestasi_akademik: number;
+  prestasi_nonakademik: number;
+  perilaku: number;
+  keaktifan_organisasi: number;
+  final_score: number;
+  rank: number;
+}
+
+interface Periode {
+  id_periode: string;
+  tahun: string;
+  semester: number;
+  deskripsi: string;
+}
+
+const columns: ColumnDef<HasilSAW>[] = [
   {
-    ranking: 1,
-    tahun: "2024/2025",
-    semester: 1,
-    nim: "2021001",
-    nama: "Ahmad Rizki Pratama",
-    nilaiAkhir: 0.952,
+    accessorKey: "rank",
+    header: "Peringkat",
   },
   {
-    ranking: 2,
-    tahun: "2024/2025",
-    semester: 1,
-    nim: "2021002",
-    nama: "Siti Nurhaliza",
-    nilaiAkhir: 0.924,
+    accessorKey: "nim",
+    header: "NIM",
   },
   {
-    ranking: 3,
-    tahun: "2024/2025",
-    semester: 1,
-    nim: "2021004",
-    nama: "Dewi Sartika",
-    nilaiAkhir: 0.891,
+    accessorKey: "nama",
+    header: "Nama",
   },
   {
-    ranking: 4,
-    tahun: "2024/2025",
-    semester: 1,
-    nim: "2021005",
-    nama: "Eko Prasetyo",
-    nilaiAkhir: 0.876,
+    accessorKey: "nilai_akademik",
+    header: "Nilai Akademik",
+    cell: ({ row }) => (
+      <div>{row.getValue<number>("nilai_akademik").toFixed(2)}</div>
+    ),
   },
   {
-    ranking: 5,
-    tahun: "2024/2025",
-    semester: 1,
-    nim: "2021003",
-    nama: "Budi Santoso",
-    nilaiAkhir: 0.843,
+    accessorKey: "kehadiran",
+    header: "Kehadiran",
+    cell: ({ row }) => (
+      <div>{row.getValue<number>("kehadiran").toFixed(2)}%</div>
+    ),
+  },
+  {
+    accessorKey: "prestasi_akademik",
+    header: "Prestasi Akademik",
+  },
+  {
+    accessorKey: "prestasi_nonakademik",
+    header: "Prestasi Non-Akademik",
+  },
+  {
+    accessorKey: "perilaku",
+    header: "Perilaku",
+  },
+  {
+    accessorKey: "keaktifan_organisasi",
+    header: "Keaktifan Organisasi",
+  },
+  {
+    accessorKey: "final_score",
+    header: "Nilai Akhir",
+    cell: ({ row }) => (
+      <div>{row.getValue<number>("final_score").toFixed(4)}</div>
+    ),
   },
 ];
 
 export function HasilSawContent() {
+  const [data, setData] = useState<HasilSAW[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [periodes, setPeriodes] = useState<Periode[]>([]);
+  const [selectedPeriode, setSelectedPeriode] = useState<string>("");
+
+  useEffect(() => {
+    const fetchPeriodes = async () => {
+      try {
+        const response = await fetch("/api/periode");
+        const data = await response.json();
+        setPeriodes(data);
+        if (data.length > 0) {
+          setSelectedPeriode(data[0].id_periode);
+        }
+      } catch (error) {
+        console.error("Error fetching periodes:", error);
+      }
+    };
+
+    fetchPeriodes();
+  }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!selectedPeriode) return;
+
+      setLoading(true);
+      try {
+        const response = await fetch(`/api/saw?periode=${selectedPeriode}`);
+        const data = await response.json();
+        setData(data);
+      } catch (error) {
+        console.error("Error fetching SAW results:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [selectedPeriode]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
+
   return (
-    <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>Hasil Ranking SAW</CardTitle>
-              <CardDescription>
-                Hasil perhitungan ranking mahasiswa menggunakan metode Simple
-                Additive Weighting
-              </CardDescription>
-            </div>
-            <Button>
-              <Download className="mr-2 h-4 w-4" />
-              Export PDF
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center space-x-2 mb-4">
-            <div className="relative flex-1 max-w-sm">
-              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input placeholder="Cari mahasiswa..." className="pl-8" />
-            </div>
-            <Select defaultValue="2024/2025-1">
-              <SelectTrigger className="w-[200px]">
-                <SelectValue placeholder="Pilih periode" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="2024/2025-1">
-                  2024/2025 - Semester 1
+    <Card>
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <CardTitle>Hasil Perhitungan SAW</CardTitle>
+          <Select value={selectedPeriode} onValueChange={setSelectedPeriode}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Pilih Periode" />
+            </SelectTrigger>
+            <SelectContent>
+              {periodes.map((periode) => (
+                <SelectItem key={periode.id_periode} value={periode.id_periode}>
+                  {periode.tahun} Semester {periode.semester}
                 </SelectItem>
-                <SelectItem value="2023/2024-2">
-                  2023/2024 - Semester 2
-                </SelectItem>
-                <SelectItem value="2023/2024-1">
-                  2023/2024 - Semester 1
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[80px]">Ranking</TableHead>
-                  <TableHead>Tahun</TableHead>
-                  <TableHead>Semester</TableHead>
-                  <TableHead>NIM</TableHead>
-                  <TableHead>Nama</TableHead>
-                  <TableHead className="text-right">Nilai Akhir</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {hasilSawData.map((hasil) => (
-                  <TableRow
-                    key={`${hasil.nim}-${hasil.tahun}-${hasil.semester}`}
-                  >
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        {hasil.ranking <= 3 && (
-                          <Trophy
-                            className={`h-4 w-4 ${
-                              hasil.ranking === 1
-                                ? "text-yellow-500"
-                                : hasil.ranking === 2
-                                ? "text-gray-400"
-                                : "text-amber-600"
-                            }`}
-                          />
-                        )}
-                        <span className="font-medium">#{hasil.ranking}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>{hasil.tahun}</TableCell>
-                    <TableCell>
-                      <Badge variant="outline">Semester {hasil.semester}</Badge>
-                    </TableCell>
-                    <TableCell className="font-medium">{hasil.nim}</TableCell>
-                    <TableCell>{hasil.nama}</TableCell>
-                    <TableCell className="text-right">
-                      <Badge
-                        variant={hasil.ranking <= 3 ? "default" : "secondary"}
-                        className="font-mono"
-                      >
-                        {hasil.nilaiAkhir.toFixed(3)}
-                      </Badge>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <DataTable columns={columns} data={data} />
+      </CardContent>
+    </Card>
   );
 }

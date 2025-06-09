@@ -1,0 +1,42 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Mahasiswa {
+  nim                  String   @id
+  nama                 String
+  nilai_akademik       Float
+  kehadiran            Float
+  prestasi_akademik    Int
+  prestasi_nonakademik Int
+  perilaku             Int
+  keaktifan_organisasi Int
+  tanggal_input        DateTime
+  periode              Periode  @relation(fields: [periodeId_periode], references: [id_periode])
+  periodeId_periode    String
+}
+
+model Periode {
+  id_periode              String      @id
+  tahun                   String
+  semester                Int
+  w1_nilai_akademik       Float
+  w2_kehadiran            Float
+  w3_prestasi_akademik    Float
+  w4_prestasi_nonakademik Float
+  w5_perilaku             Float
+  w6_keaktifan_organisasi Float
+  deskripsi               String
+  mahasiswa               Mahasiswa[]
+}
