@@ -1,9 +1,18 @@
 import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
-
+import { auth } from "@clerk/nextjs/server";
 
 export async function GET(request: Request) {
   try {
+    const { userId } = await auth();
+
+    if (!userId) {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+
     const { searchParams } = new URL(request.url);
     const periodeId = searchParams.get("periode");
 
@@ -11,6 +20,21 @@ export async function GET(request: Request) {
       return NextResponse.json(
         { error: "Periode ID is required" },
         { status: 400 }
+      );
+    }
+
+    // Verify the periode belongs to the current user
+    const periode = await prisma.periode.findFirst({
+      where: {
+        id_periode: periodeId,
+        userId: userId,
+      },
+    });
+
+    if (!periode) {
+      return NextResponse.json(
+        { error: "Periode not found or access denied" },
+        { status: 404 }
       );
     }
 

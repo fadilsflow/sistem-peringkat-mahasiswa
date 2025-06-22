@@ -2,8 +2,29 @@
 
 import { prisma } from "@/lib/db";
 import { revalidatePath } from "next/cache";
+import { auth } from "@clerk/nextjs/server";
 
 export async function getMahasiswaList(periodeId?: string) {
+  const { userId } = await auth();
+
+  if (!userId) {
+    throw new Error("Unauthorized");
+  }
+
+  if (periodeId) {
+    // Verify the periode belongs to the current user
+    const periode = await prisma.periode.findFirst({
+      where: {
+        id_periode: periodeId,
+        userId: userId,
+      },
+    });
+
+    if (!periode) {
+      throw new Error("Periode not found or access denied");
+    }
+  }
+
   return await prisma.mahasiswa.findMany({
     where: periodeId ? { periodeId_periode: periodeId } : undefined,
     include: { periode: true },
@@ -12,6 +33,12 @@ export async function getMahasiswaList(periodeId?: string) {
 }
 
 export async function getMahasiswaById(nim: string) {
+  const { userId } = await auth();
+
+  if (!userId) {
+    throw new Error("Unauthorized");
+  }
+
   return await prisma.mahasiswa.findUnique({
     where: { nim },
     include: { periode: true },
@@ -32,6 +59,12 @@ interface CreateMahasiswaData {
 
 export async function createMahasiswa(data: CreateMahasiswaData) {
   try {
+    const { userId } = await auth();
+
+    if (!userId) {
+      throw new Error("Unauthorized");
+    }
+
     // Check if mahasiswa already exists
     const existingMahasiswa = await prisma.mahasiswa.findUnique({
       where: {
@@ -43,16 +76,17 @@ export async function createMahasiswa(data: CreateMahasiswaData) {
       throw new Error(`Mahasiswa dengan NIM ${data.nim} sudah ada`);
     }
 
-    // Check if periode exists
-    const periode = await prisma.periode.findUnique({
+    // Check if periode exists and belongs to the current user
+    const periode = await prisma.periode.findFirst({
       where: {
         id_periode: data.periodeId_periode,
+        userId: userId,
       },
     });
 
     if (!periode) {
       throw new Error(
-        `Periode dengan ID ${data.periodeId_periode} tidak ditemukan`
+        `Periode dengan ID ${data.periodeId_periode} tidak ditemukan atau akses ditolak`
       );
     }
 
@@ -97,6 +131,24 @@ export async function updateMahasiswa(
     keaktifan_organisasi: number;
   }
 ) {
+  const { userId } = await auth();
+
+  if (!userId) {
+    throw new Error("Unauthorized");
+  }
+
+  // Verify the periode belongs to the current user
+  const periode = await prisma.periode.findFirst({
+    where: {
+      id_periode: data.periodeId_periode,
+      userId: userId,
+    },
+  });
+
+  if (!periode) {
+    throw new Error("Periode not found or access denied");
+  }
+
   await prisma.mahasiswa.update({
     where: { nim },
     data: {
@@ -111,6 +163,12 @@ export async function updateMahasiswa(
 
 export async function deleteMahasiswa(nim: string) {
   try {
+    const { userId } = await auth();
+
+    if (!userId) {
+      throw new Error("Unauthorized");
+    }
+
     await prisma.mahasiswa.delete({
       where: {
         nim,

@@ -2,16 +2,35 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "../db";
+import { auth } from "@clerk/nextjs/server";
 
 export async function getPeriodeList() {
+  const { userId } = await auth();
+
+  if (!userId) {
+    throw new Error("Unauthorized");
+  }
+
   return await prisma.periode.findMany({
+    where: {
+      userId: userId,
+    },
     orderBy: [{ tahun: "desc" }, { semester: "desc" }],
   });
 }
 
 export async function getPeriodeById(id: string) {
-  return await prisma.periode.findUnique({
-    where: { id_periode: id },
+  const { userId } = await auth();
+
+  if (!userId) {
+    throw new Error("Unauthorized");
+  }
+
+  return await prisma.periode.findFirst({
+    where: {
+      id_periode: id,
+      userId: userId,
+    },
   });
 }
 
@@ -27,7 +46,18 @@ export async function createPeriode(data: {
   w6_keaktifan_organisasi: number;
   deskripsi: string;
 }) {
-  await prisma.periode.create({ data });
+  const { userId } = await auth();
+
+  if (!userId) {
+    throw new Error("Unauthorized");
+  }
+
+  await prisma.periode.create({
+    data: {
+      ...data,
+      userId: userId,
+    }
+  });
   revalidatePath("/periode");
   revalidatePath("/dashboard");
 }
@@ -46,8 +76,17 @@ export async function updatePeriode(
     deskripsi: string;
   }
 ) {
+  const { userId } = await auth();
+
+  if (!userId) {
+    throw new Error("Unauthorized");
+  }
+
   await prisma.periode.update({
-    where: { id_periode: id },
+    where: {
+      id_periode: id,
+      userId: userId,
+    },
     data,
   });
   revalidatePath("/periode");
@@ -55,6 +94,12 @@ export async function updatePeriode(
 }
 
 export async function deletePeriode(id: string) {
+  const { userId } = await auth();
+
+  if (!userId) {
+    throw new Error("Unauthorized");
+  }
+
   // Delete all mahasiswa records associated with this periode first
   await prisma.mahasiswa.deleteMany({
     where: {
@@ -64,7 +109,10 @@ export async function deletePeriode(id: string) {
 
   // Then delete the periode
   await prisma.periode.delete({
-    where: { id_periode: id },
+    where: {
+      id_periode: id,
+      userId: userId,
+    },
   });
 
   revalidatePath("/periode");

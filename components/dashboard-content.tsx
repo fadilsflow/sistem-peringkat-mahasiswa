@@ -42,9 +42,13 @@ import {
 } from "@/lib/hooks/use-queries";
 import { getRanking } from "@/lib/utils/saw";
 import { HasilSawContent } from "./hasil-saw-content";
+import { useUser } from "@clerk/nextjs";
+import Link from "next/link";
+import { Button } from "./ui/button";
 
 export function DashboardContent() {
   const [selectedPeriodeId, setSelectedPeriodeId] = useState<string>("");
+  const { user } = useUser();
 
   const {
     data: periodeList = [],
@@ -95,14 +99,19 @@ export function DashboardContent() {
 
   if (!activePeriode) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Selamat Datang</CardTitle>
-          <CardDescription>
-            Silakan tambahkan periode dan data mahasiswa untuk memulai
-          </CardDescription>
-        </CardHeader>
-      </Card>
+      <div className="h-110 flex flex-col items-center justify-center gap-4">
+        <h1 className="text-3xl sm:text-5xl font-bold tracking-tight text-primary">
+          Selamat Datang di SyncRank!
+        </h1>
+        <p className="text-muted-foreground text-lg text-center">
+          Anda Belum memiliki periode yang aktif. Silakan tambahkan periode
+          untuk memulai.
+        </p>
+
+        <Button asChild>
+          <Link href="/manage">Tambah Periode</Link>
+        </Button>
+      </div>
     );
   }
 

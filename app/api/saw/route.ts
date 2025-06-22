@@ -1,10 +1,19 @@
 import { prisma } from "@/lib/db";
 import { Mahasiswa } from "@prisma/client";
 import { NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
 
 export async function GET(request: Request) {
-  
   try {
+    const { userId } = await auth();
+
+    if (!userId) {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+
     const { searchParams } = new URL(request.url);
     const periodeId = searchParams.get("periode");
 
@@ -15,13 +24,16 @@ export async function GET(request: Request) {
       );
     }
 
-    // Get periode data for weights
-    const periode = await prisma.periode.findUnique({
-      where: { id_periode: periodeId },
+    // Get periode data for weights and verify ownership
+    const periode = await prisma.periode.findFirst({
+      where: {
+        id_periode: periodeId,
+        userId: userId,
+      },
     });
 
     if (!periode) {
-      return NextResponse.json({ error: "Periode not found" }, { status: 404 });
+      return NextResponse.json({ error: "Periode not found or access denied" }, { status: 404 });
     }
 
     // Get mahasiswa data
