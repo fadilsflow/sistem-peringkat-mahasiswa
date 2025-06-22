@@ -22,7 +22,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <Providers>
-          <div className="min-h-screen bg-background">
+          <div className="min-h-screen bg-background text-primary">
             <Header />
             <main className="container mx-auto py-6 px-4 sm:px-10 ">
               {children}

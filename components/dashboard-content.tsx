@@ -42,14 +42,11 @@ import {
 } from "@/lib/hooks/use-queries";
 import { getRanking } from "@/lib/utils/saw";
 import { HasilSawContent } from "./hasil-saw-content";
-import { useUser } from "@clerk/nextjs";
 import Link from "next/link";
 import { Button } from "./ui/button";
 
 export function DashboardContent() {
   const [selectedPeriodeId, setSelectedPeriodeId] = useState<string>("");
-  const { user } = useUser();
-
   const {
     data: periodeList = [],
     isError: isPeriodeError,

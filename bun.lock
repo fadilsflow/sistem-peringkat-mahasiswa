@@ -22,6 +22,7 @@
         "@types/papaparse": "^5.3.16",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
+        "dicons": "^1.1.7",
         "file-saver": "^2.0.5",
         "lucide-react": "^0.513.0",
         "motion": "^12.18.1",
@@ -565,6 +566,8 @@
     "detect-libc": ["detect-libc@2.0.4", "", {}, "sha512-3UDv+G9CsCKO1WKMGw9fwq/SWJYbI0c5Y7LU1AXYoDdbhE2AHQ6N6Nb34sG8Fj7T5APy8qXDCKuuIHd1BR0tVA=="],
 
     "detect-node-es": ["detect-node-es@1.1.0", "", {}, "sha512-ypdmJU/TbBby2Dxibuv7ZLW3Bs1QEmM7nHjEANfohJLvE0XVujisn1qPJcZxg+qDucsr+bP6fLD1rPS3AhJ7EQ=="],
+
+    "dicons": ["dicons@1.1.7", "", {}, "sha512-SjtsJhOHpq4CYGjHmBkRXkzOtafE9dybfvnym8KLPoCocDN9LBCGbOKCxGo5UsIKqCtYz7RUqNswaOiCh+wtfg=="],
 
     "doctrine": ["doctrine@2.1.0", "", { "dependencies": { "esutils": "^2.0.2" } }, "sha512-35mSku4ZXK0vfCuHEDAwt55dg2jNajHZ1odvF+8SSr82EsZY4QmXfuWso8oEd8zRhVObSN18aM0CjSdoBX7zIw=="],
 

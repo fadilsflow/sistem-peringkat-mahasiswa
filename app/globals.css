@@ -39,7 +39,7 @@
   --font-sans: Geist Mono, monospace;
   --font-serif: Geist Mono, monospace;
   --font-mono: Geist Mono, monospace;
-  --radius: 0rem;
+  --radius: 1rem;
   --shadow-2xs: 0px 1px 0px 0px hsl(0 0% 0% / 0);
   --shadow-xs: 0px 1px 0px 0px hsl(0 0% 0% / 0);
   --shadow-sm:

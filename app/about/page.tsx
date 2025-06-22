@@ -13,13 +13,12 @@ export default function About() {
           <h1 className="text-5xl text-center text-primary uppercase font-light">
             Tentang
             <br />
-            <span className="font-light">Sync</span>{" "}
-            <span className="font-medium">Rank</span>
+            <span className="font-light underline">SYNCRANK</span>
           </h1>
 
           <div className="prose prose-gray dark:prose-invert max-w-none">
-            <p className="text-md text-muted-foreground leading-relaxed">
-              Sistem Peringkat Mahasiswa (SyncRank) adalah platform yang
+            <p className="text-md text-primary-50 leading-relaxed">
+              Sistem Peringkat Mahasiswa (SYNCRANK) adalah platform yang
               dirancang untuk membantu institusi pendidikan dalam mengelola dan
               memantau prestasi akademik mahasiswa. Dengan fokus pada
               transparansi dan efisiensi, kami bertujuan untuk memberikan solusi
@@ -27,9 +26,9 @@ export default function About() {
             </p>
 
             <h2 className="text-2xl mt-8 mb-4">Pendekatan Kami</h2>
-            <p className="text-md text-muted-foreground leading-relaxed">
+            <p className="text-md text-primary-50 leading-relaxed">
               Kami memahami pentingnya sistem penilaian yang akurat dan
-              transparan dalam lingkungan akademik. SyncRank dikembangkan dengan
+              transparan dalam lingkungan akademik. SYNCRANK dikembangkan dengan
               mempertimbangkan kebutuhan berbagai pemangku kepentingan dalam
               institusi pendidikan, mulai dari staf akademik hingga mahasiswa.
               Platform ini menyediakan antarmuka yang intuitif dan fitur-fitur
@@ -37,10 +36,10 @@ export default function About() {
             </p>
 
             <h2 className="text-2xl mt-8 mb-4">Komitmen Kami</h2>
-            <p className="text-muted-foreground leading-relaxed">
+            <p className="text-primary-50 leading-relaxed">
               Kami berkomitmen untuk terus mengembangkan dan meningkatkan
               platform ini sesuai dengan kebutuhan pengguna. Dengan fokus pada
-              keamanan data dan kemudahan penggunaan, SyncRank bertujuan menjadi
+              keamanan data dan kemudahan penggunaan, SYNCRANK bertujuan menjadi
               solusi terpercaya untuk manajemen peringkat akademik di institusi
               pendidikan tinggi.
             </p>

@@ -42,7 +42,8 @@ export default function FeaturesSection() {
     },
     {
       title: "Autentikasi Dosen",
-      description: "Autentikasi Dosen atau Guru sebagai pengelola data dengan keamanan yang terjamin.",
+      description:
+        "Autentikasi Dosen atau Guru sebagai pengelola data dengan keamanan yang terjamin.",
       icon: <Shield className="w-6 h-6" />,
     },
   ];
@@ -81,18 +82,18 @@ const Feature = ({
       {index >= 3 && (
         <div className="opacity-0 group-hover/feature:opacity-100 transition duration-200 absolute inset-0 h-full w-full bg-gradient-to-b from-muted to-transparent pointer-events-none" />
       )}
-      <div className="mb-4 relative z-10 px-10 text-muted-foreground">
+      <div className="mb-4 relative z-10 px-10 text-primary">
         {icon}
       </div>
       <div className="text-lg font-bold mb-2 relative z-10 px-10">
         <div className="absolute left-0 inset-y-0 h-6 group-hover/feature:h-8 w-1 rounded-tr-full rounded-br-full bg-border group-hover/feature:bg-primary transition-all duration-200 origin-center" />
-        <span className="group-hover/feature:translate-x-2 transition duration-200 inline-block text-foreground">
+        <span className="group-hover/feature:translate-x-2 transition duration-200 inline-block text-primary">
           {title}
         </span>
       </div>
-      <p className="text-sm text-muted-foreground max-w-xs relative z-10 px-10">
+      <p className="text-sm text-primary max-w-xs relative z-10 px-10">
         {description}
       </p>
     </div>
   );
-}; 
+};
