@@ -192,7 +192,7 @@ export function ManageContent() {
     try {
       setIsDeleting(true);
       toast.loading("Menghapus data mahasiswa...");
-      await deleteMahasiswa(mahasiswa.nim);
+      await deleteMahasiswa(mahasiswa.nim, selectedPeriodeId);
       toast.dismiss();
       toast.success("Data mahasiswa berhasil dihapus");
       queryClient.invalidateQueries({

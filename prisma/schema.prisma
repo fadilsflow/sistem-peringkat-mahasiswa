@@ -14,7 +14,7 @@ datasource db {
 }
 
 model Mahasiswa {
-  nim                  String   @id
+  nim                  String
   nama                 String
   nilai_akademik       Float
   kehadiran            Float
@@ -25,6 +25,9 @@ model Mahasiswa {
   tanggal_input        DateTime
   periode              Periode  @relation(fields: [periodeId_periode], references: [id_periode])
   periodeId_periode    String
+
+  @@id([nim, periodeId_periode])
+  @@index([periodeId_periode])
 }
 
 model Periode {

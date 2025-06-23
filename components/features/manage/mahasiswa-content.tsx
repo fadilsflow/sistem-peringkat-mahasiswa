@@ -91,23 +91,27 @@ export function MahasiswaContent() {
     setIsEditDialogOpen(true);
   };
 
-  const handleDelete = async (mahasiswa: Mahasiswa) => {
+  const handleDelete = async () => {
+    if (!mahasiswaToDelete) return;
+
     try {
       setIsDeleting(true);
-      toast.loading("Menghapus data mahasiswa...");
-      await deleteMahasiswa(mahasiswa.nim);
-      toast.dismiss();
+      await deleteMahasiswa(
+        mahasiswaToDelete.nim,
+        mahasiswaToDelete.periodeId_periode
+      );
       toast.success("Data mahasiswa berhasil dihapus");
+      setIsDeleteDialogOpen(false);
+      setMahasiswaToDelete(null);
+      // Invalidate and refetch queries
+      queryClient.invalidateQueries({ queryKey: ["periodes"] });
       if (selectedPeriodeId) {
         queryClient.invalidateQueries({
           queryKey: ["mahasiswa", selectedPeriodeId],
         });
       }
-      setIsDeleteDialogOpen(false);
-      setMahasiswaToDelete(null);
     } catch (error) {
       console.error(error);
-      toast.dismiss();
       toast.error("Gagal menghapus data mahasiswa");
     } finally {
       setIsDeleting(false);
@@ -336,9 +340,7 @@ export function MahasiswaContent() {
             </Button>
             <Button
               variant="destructive"
-              onClick={() =>
-                mahasiswaToDelete && handleDelete(mahasiswaToDelete)
-              }
+              onClick={handleDelete}
               disabled={isDeleting}
             >
               {isDeleting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

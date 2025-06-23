@@ -32,15 +32,18 @@ export async function getMahasiswaList(periodeId?: string) {
   });
 }
 
-export async function getMahasiswaById(nim: string) {
+export async function getMahasiswaById(nim: string, periodeId: string) {
   const { userId } = await auth();
 
   if (!userId) {
     throw new Error("Unauthorized");
   }
 
-  return await prisma.mahasiswa.findUnique({
-    where: { nim },
+  return await prisma.mahasiswa.findFirst({
+    where: {
+      nim,
+      periodeId_periode: periodeId,
+    },
     include: { periode: true },
   });
 }
@@ -65,18 +68,6 @@ export async function createMahasiswa(data: CreateMahasiswaData) {
       throw new Error("Unauthorized");
     }
 
-    // Check if mahasiswa already exists
-    const existingMahasiswa = await prisma.mahasiswa.findUnique({
-      where: {
-        nim: data.nim,
-        periodeId_periode: data.periodeId_periode,
-      },
-    });
-
-    if (existingMahasiswa) {
-      throw new Error(`Mahasiswa dengan NIM ${data.nim} sudah ada`);
-    }
-
     // Check if periode exists and belongs to the current user
     const periode = await prisma.periode.findFirst({
       where: {
@@ -88,6 +79,20 @@ export async function createMahasiswa(data: CreateMahasiswaData) {
     if (!periode) {
       throw new Error(
         `Periode dengan ID ${data.periodeId_periode} tidak ditemukan atau akses ditolak`
+      );
+    }
+
+    // Check if mahasiswa already exists in this period
+    const existingMahasiswa = await prisma.mahasiswa.findFirst({
+      where: {
+        nim: data.nim,
+        periodeId_periode: data.periodeId_periode,
+      },
+    });
+
+    if (existingMahasiswa) {
+      throw new Error(
+        `Mahasiswa dengan NIM ${data.nim} sudah ada di periode ini`
       );
     }
 
@@ -121,6 +126,7 @@ export async function createMahasiswa(data: CreateMahasiswaData) {
 
 export async function updateMahasiswa(
   nim: string,
+  periodeId: string,
   data: {
     nama: string;
     periodeId_periode: string;
@@ -150,8 +156,11 @@ export async function updateMahasiswa(
     throw new Error("Periode not found or access denied");
   }
 
-  await prisma.mahasiswa.update({
-    where: { nim },
+  await prisma.mahasiswa.updateMany({
+    where: {
+      nim,
+      periodeId_periode: periodeId,
+    },
     data: {
       ...data,
       tanggal_input: new Date(),
@@ -162,7 +171,7 @@ export async function updateMahasiswa(
   revalidatePath("/dashboard");
 }
 
-export async function deleteMahasiswa(nim: string) {
+export async function deleteMahasiswa(nim: string, periodeId: string) {
   try {
     const { userId } = await auth();
 
@@ -170,9 +179,10 @@ export async function deleteMahasiswa(nim: string) {
       throw new Error("Unauthorized");
     }
 
-    await prisma.mahasiswa.delete({
+    await prisma.mahasiswa.deleteMany({
       where: {
         nim,
+        periodeId_periode: periodeId,
       },
     });
 
@@ -193,25 +203,6 @@ export async function createMahasiswaBulk(data: CreateMahasiswaData[]) {
       throw new Error("Unauthorized");
     }
 
-    // Get unique NIMs to check for duplicates
-    const nims = data.map((item) => item.nim);
-    const existingMahasiswa = await prisma.mahasiswa.findMany({
-      where: {
-        nim: {
-          in: nims,
-        },
-      },
-      select: {
-        nim: true,
-      },
-    });
-
-    if (existingMahasiswa.length > 0) {
-      throw new Error(
-        `Beberapa NIM sudah terdaftar: ${existingMahasiswa.map((m) => m.nim).join(", ")}`
-      );
-    }
-
     // Check if periode exists and belongs to the current user
     const periodeId = data[0]?.periodeId_periode;
     if (!periodeId) {
@@ -227,6 +218,23 @@ export async function createMahasiswaBulk(data: CreateMahasiswaData[]) {
 
     if (!periode) {
       throw new Error("Periode tidak ditemukan atau akses ditolak");
+    }
+
+    // Check for existing mahasiswa in this period
+    const nims = data.map((item) => item.nim);
+    const existingMahasiswa = await prisma.mahasiswa.findMany({
+      where: {
+        AND: [{ nim: { in: nims } }, { periodeId_periode: periodeId }],
+      },
+      select: {
+        nim: true,
+      },
+    });
+
+    if (existingMahasiswa.length > 0) {
+      throw new Error(
+        `Beberapa NIM sudah terdaftar di periode ini: ${existingMahasiswa.map((m) => m.nim).join(", ")}`
+      );
     }
 
     // Create all mahasiswa records in a single transaction

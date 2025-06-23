@@ -98,8 +98,10 @@ export function PeriodeForm({ initialData, onSuccess }: PeriodeFormProps) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 max-h-[500px] overflow-y-auto px-1">
-        
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="space-y-4 max-h-[500px] overflow-y-auto px-1"
+      >
         <FormField
           control={form.control}
           name="id_periode"
@@ -110,7 +112,7 @@ export function PeriodeForm({ initialData, onSuccess }: PeriodeFormProps) {
                 <Input
                   placeholder="2024-1"
                   {...field}
-                //   disabled={!!initialData}
+                  //   disabled={!!initialData}
                 />
               </FormControl>
               <FormDescription>
@@ -298,8 +300,8 @@ export function PeriodeForm({ initialData, onSuccess }: PeriodeFormProps) {
           {isLoading
             ? "Menyimpan..."
             : initialData
-            ? "Update Periode"
-            : "Tambah Periode"}
+              ? "Update Periode"
+              : "Tambah Periode"}
         </Button>
       </form>
     </Form>

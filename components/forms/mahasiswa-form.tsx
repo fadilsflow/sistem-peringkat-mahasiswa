@@ -72,7 +72,11 @@ export function MahasiswaForm({
     try {
       setIsLoading(true);
       if (initialData) {
-        await updateMahasiswa(initialData.nim, data);
+        await updateMahasiswa(
+          initialData.nim,
+          initialData.periodeId_periode,
+          data
+        );
       } else {
         await createMahasiswa(data);
       }
