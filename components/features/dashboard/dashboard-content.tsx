@@ -66,8 +66,8 @@ export function DashboardContent() {
   if (isPeriodeLoading) {
     return (
       <div className="h-110 flex flex-col items-center justify-center gap-4">
-        <h1 className="text-3xl sm:text-5xl font-bold tracking-tight text-primary">
-          Loading...
+        <h1 className="animate-spin  text-3xl sm:text-5xl font-bold tracking-tight text-primary">
+          Loading😭
         </h1>
       </div>
     );
