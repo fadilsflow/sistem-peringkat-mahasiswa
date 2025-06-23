@@ -69,6 +69,7 @@ export async function createMahasiswa(data: CreateMahasiswaData) {
     const existingMahasiswa = await prisma.mahasiswa.findUnique({
       where: {
         nim: data.nim,
+        periodeId_periode: data.periodeId_periode,
       },
     });
 

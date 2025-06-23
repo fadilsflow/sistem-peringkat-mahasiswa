@@ -290,9 +290,9 @@ export function MahasiswaForm({
           {isLoading
             ? "Menyimpan..."
             : initialData
-            ? "Update Data"
-            : "Tambah Data"}
-        </Button>   
+              ? "Update Data"
+              : "Tambah Data"}
+        </Button>
       </form>
     </Form>
   );

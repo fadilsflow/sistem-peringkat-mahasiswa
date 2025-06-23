@@ -8,10 +8,7 @@ export async function GET(request: Request) {
     const { userId } = await auth();
 
     if (!userId) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { searchParams } = new URL(request.url);
@@ -55,7 +52,7 @@ export async function GET(request: Request) {
 
     const avgKehadiran =
       mahasiswa.reduce((sum: number, m: Mahasiswa) => sum + m.kehadiran, 0) /
-      totalMahasiswa || 0;
+        totalMahasiswa || 0;
 
     const avgPrestasi =
       mahasiswa.reduce(
