@@ -44,7 +44,7 @@ export function Header() {
 
             <SignedIn>
               {isHome ? (
-                <Button size="sm" className="text-sm">
+                <Button size="sm" className="text-sm" asChild>
                   <Link href="/dashboard">Dashboard</Link>
                 </Button>
               ) : (
