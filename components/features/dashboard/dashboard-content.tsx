@@ -48,12 +48,27 @@ import React from "react";
 
 export function DashboardContent() {
   const [selectedPeriodeId, setSelectedPeriodeId] = useState<string>("");
+
   const {
     data: periodeList = [],
     isError: isPeriodeError,
     error: periodeError,
     isLoading: isPeriodeLoading,
   } = usePeriodes();
+
+  const {
+    data: stats,
+    isError: isStatsError,
+    error: statsError,
+    isLoading: isStatsLoading,
+  } = useDashboardStats(selectedPeriodeId || null);
+
+  const {
+    data: mahasiswaList = [],
+    isError: isMahasiswaError,
+    error: mahasiswaError,
+    isLoading: isMahasiswaLoading,
+  } = useMahasiswaByPeriode(selectedPeriodeId || null);
 
   // Set initial periode
   React.useEffect(() => {
@@ -66,7 +81,7 @@ export function DashboardContent() {
   if (isPeriodeLoading) {
     return (
       <div className="h-110 flex flex-col items-center justify-center gap-4">
-        <h1 className="animate-spin  text-3xl sm:text-5xl font-bold tracking-tight text-primary">
+        <h1 className="animate-spin text-3xl sm:text-5xl font-bold tracking-tight text-primary">
           Loading😭
         </h1>
       </div>
@@ -104,21 +119,6 @@ export function DashboardContent() {
       </Alert>
     );
   }
-
-  // Only fetch dashboard and mahasiswa data if we have a selected period
-  const {
-    data: stats,
-    isError: isStatsError,
-    error: statsError,
-    isLoading: isStatsLoading,
-  } = useDashboardStats(selectedPeriodeId || null);
-
-  const {
-    data: mahasiswaList = [],
-    isError: isMahasiswaError,
-    error: mahasiswaError,
-    isLoading: isMahasiswaLoading,
-  } = useMahasiswaByPeriode(selectedPeriodeId || null);
 
   const activePeriode = periodeList.find(
     (p) => p.id_periode === selectedPeriodeId
