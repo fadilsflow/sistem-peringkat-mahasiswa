@@ -84,6 +84,7 @@ export function ManageContent() {
   );
   const queryClient = useQueryClient();
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
 
   const {
     data: periodeList = [],
@@ -95,7 +96,9 @@ export function ManageContent() {
     data: mahasiswaList = [],
     isError: isMahasiswaError,
     error: mahasiswaError,
-  } = useMahasiswaByPeriode(selectedPeriodeId);
+  } = useMahasiswaByPeriode(
+    selectedPeriodeId === "" ? null : selectedPeriodeId
+  );
 
   // Set initial periode
   if (selectedPeriodeId === "" && periodeList.length > 0) {
@@ -103,6 +106,12 @@ export function ManageContent() {
   }
 
   const handleSuccess = () => {
+    // Close all dialogs
+    setIsEditPeriodeDialogOpen(false);
+    setIsEditMahasiswaDialogOpen(false);
+    setSelectedPeriode(null);
+    setSelectedMahasiswa(null);
+
     // Invalidate and refetch queries
     queryClient.invalidateQueries({ queryKey: ["periodes"] });
     if (selectedPeriodeId) {
@@ -125,25 +134,39 @@ export function ManageContent() {
   const handleDelete = async (periode: Periode) => {
     try {
       setIsDeleting(true);
+      toast.loading("Menghapus periode...");
       await deletePeriode(periode.id_periode);
+      toast.dismiss();
+      toast.success("Periode berhasil dihapus");
+
       // Invalidate both queries to update the UI
-      await queryClient.invalidateQueries({ queryKey: ["periodes"] });
-      await queryClient.invalidateQueries({
+      queryClient.invalidateQueries({ queryKey: ["periodes"] });
+
+      // Remove the mahasiswa data for the deleted period from the cache
+      queryClient.setQueryData(["mahasiswa", periode.id_periode], []);
+      queryClient.invalidateQueries({
         queryKey: ["mahasiswa", periode.id_periode],
         exact: true,
       });
 
-      // If we're deleting the currently selected periode, reset selection
+      // If we're deleting the currently selected periode, select the next available one
       if (selectedPeriodeId === periode.id_periode) {
-        setSelectedPeriodeId("");
+        const updatedPeriodes = periodeList.filter(
+          (p) => p.id_periode !== periode.id_periode
+        );
+        if (updatedPeriodes.length > 0) {
+          setSelectedPeriodeId(updatedPeriodes[0].id_periode);
+        } else {
+          setSelectedPeriodeId("");
+        }
       }
 
-      toast.success("Periode berhasil dihapus");
       setIsDeleteDialogOpen(false);
       setPeriodeToDelete(null);
       setSelectedPeriode(null);
     } catch (error) {
       console.error(error);
+      toast.dismiss();
       toast.error("Gagal menghapus periode");
     } finally {
       setIsDeleting(false);
@@ -153,16 +176,19 @@ export function ManageContent() {
   const handleDeleteMahasiswa = async (mahasiswa: Mahasiswa) => {
     try {
       setIsDeleting(true);
+      toast.loading("Menghapus data mahasiswa...");
       await deleteMahasiswa(mahasiswa.nim);
-      await queryClient.invalidateQueries({
+      toast.dismiss();
+      toast.success("Data mahasiswa berhasil dihapus");
+      queryClient.invalidateQueries({
         queryKey: ["mahasiswa", selectedPeriodeId],
       });
       setSelectedMahasiswa(null);
       setIsDeleteMahasiswaDialogOpen(false);
       setMahasiswaToDelete(null);
-      toast.success("Data mahasiswa berhasil dihapus");
     } catch (error) {
       console.error(error);
+      toast.dismiss();
       toast.error("Gagal menghapus data mahasiswa");
     } finally {
       setIsDeleting(false);
@@ -384,7 +410,7 @@ export function ManageContent() {
                     Tambahkan periode penilaian baru ke dalam sistem
                   </DialogDescription>
                 </DialogHeader>
-                
+
                 <PeriodeForm onSuccess={handleSuccess} />
               </DialogContent>
             </Dialog>
@@ -431,7 +457,10 @@ export function ManageContent() {
           </div>
           {selectedPeriodeId && (
             <div className="mt-4 flex flex-wrap items-center gap-4">
-              <Dialog>
+              <Dialog
+                open={isImportDialogOpen}
+                onOpenChange={setIsImportDialogOpen}
+              >
                 <DialogTrigger asChild>
                   <Button variant="outline">
                     <Upload className="mr-2 h-4 w-4" />
@@ -449,7 +478,7 @@ export function ManageContent() {
                   <ExcelImport
                     periodeId={selectedPeriodeId}
                     onSuccess={() => {
-                      // Invalidate mahasiswa query to refresh the data
+                      setIsImportDialogOpen(false);
                       queryClient.invalidateQueries({
                         queryKey: ["mahasiswa", selectedPeriodeId],
                         exact: true,

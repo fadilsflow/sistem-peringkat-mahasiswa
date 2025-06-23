@@ -22,7 +22,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { AlertCircle, Plus, Pencil, Trash } from "lucide-react";
+import { AlertCircle, Plus, Pencil, Trash, Loader2 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { usePeriodes } from "@/lib/hooks/use-queries";
 import { useQueryClient } from "@tanstack/react-query";
@@ -34,20 +34,27 @@ export function PeriodeContent() {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [periodeToDelete, setPeriodeToDelete] = useState<Periode | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const queryClient = useQueryClient();
   const { data: periodeList = [], isError, error } = usePeriodes();
 
   async function handleDelete(periode: Periode) {
     try {
+      setIsDeleting(true);
+      toast.loading("Menghapus periode...");
       await deletePeriode(periode.id_periode);
+      toast.dismiss();
       toast.success("Periode berhasil dihapus");
-      await queryClient.invalidateQueries({ queryKey: ["periodes"] });
+      queryClient.invalidateQueries({ queryKey: ["periodes"] });
       setIsDeleteDialogOpen(false);
       setPeriodeToDelete(null);
     } catch (error) {
       console.error(error);
+      toast.dismiss();
       toast.error("Gagal menghapus periode");
+    } finally {
+      setIsDeleting(false);
     }
   }
 
@@ -171,6 +178,7 @@ export function PeriodeContent() {
                   : "Tambahkan periode baru ke dalam sistem"}
               </DialogDescription>
             </DialogHeader>
+
             <PeriodeForm
               initialData={selectedPeriode || undefined}
               onSuccess={handleSuccess}
@@ -229,14 +237,17 @@ export function PeriodeContent() {
                 setIsDeleteDialogOpen(false);
                 setPeriodeToDelete(null);
               }}
+              disabled={isDeleting}
             >
               Batal
             </Button>
             <Button
               variant="destructive"
               onClick={() => periodeToDelete && handleDelete(periodeToDelete)}
+              disabled={isDeleting}
             >
-              Hapus
+              {isDeleting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {isDeleting ? "Menghapus..." : "Hapus"}
             </Button>
           </DialogFooter>
         </DialogContent>

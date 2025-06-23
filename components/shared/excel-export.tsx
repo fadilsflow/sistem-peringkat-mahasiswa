@@ -2,44 +2,34 @@
 
 import { Button } from "@/components/ui/button";
 import { exportToExcel } from "@/lib/utils/excel";
+import { Download } from "lucide-react";
 import { Mahasiswa } from "@prisma/client";
 
 interface ExcelExportProps {
-  data: {
-    nim: string;
-    nama: string;
-    nilai_akademik: number;
-    kehadiran: number;
-    prestasi_akademik: number;
-    prestasi_nonakademik: number;
-    perilaku: number;
-    keaktifan_organisasi: number;
-    periodeId_periode: string;
-  }[];
+  data: Mahasiswa[];
 }
 
 export default function ExcelExport({ data }: ExcelExportProps) {
   const handleExport = () => {
     const formattedData = data.map((item) => ({
-      NIM: item.nim,
-      Nama: item.nama,
-      "Nilai Akademik": item.nilai_akademik,
-      Kehadiran: item.kehadiran,
-      "Prestasi Akademik": item.prestasi_akademik,
-      "Prestasi Non-Akademik": item.prestasi_nonakademik,
-      Perilaku: item.perilaku,
-      "Keaktifan Organisasi": item.keaktifan_organisasi,
-      "ID Periode": item.periodeId_periode,
+      nim: item.nim,
+      nama: item.nama,
+      nilai_akademik: item.nilai_akademik,
+      kehadiran: item.kehadiran,
+      prestasi_akademik: item.prestasi_akademik,
+      prestasi_nonakademik: item.prestasi_nonakademik,
+      perilaku: item.perilaku,
+      keaktifan_organisasi: item.keaktifan_organisasi,
+      periodeId_periode: item.periodeId_periode,
+      tanggal_input: item.tanggal_input,
     }));
 
-    exportToExcel(
-      formattedData as unknown as Mahasiswa[],
-      "data-mahasiswa.xlsx"
-    );
+    exportToExcel(formattedData, "data-mahasiswa.xlsx");
   };
 
   return (
     <Button onClick={handleExport} variant="outline">
+      <Download className="mr-2 h-4 w-4" />
       Export Excel
     </Button>
   );

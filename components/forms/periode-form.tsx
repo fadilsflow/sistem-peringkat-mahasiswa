@@ -98,7 +98,7 @@ export function PeriodeForm({ initialData, onSuccess }: PeriodeFormProps) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 max-h-[500px] overflow-y-auto px-1">
         
         <FormField
           control={form.control}

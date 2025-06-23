@@ -22,6 +22,7 @@ import {
   School,
   Pencil,
   Trash,
+  Loader2,
 } from "lucide-react";
 import { MahasiswaForm } from "@/components/forms/mahasiswa-form";
 import ExcelImport from "@/components/shared/excel-import";
@@ -51,6 +52,8 @@ export function MahasiswaContent() {
     null
   );
   const queryClient = useQueryClient();
+  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const {
     data: periodeList = [],
@@ -90,10 +93,13 @@ export function MahasiswaContent() {
 
   const handleDelete = async (mahasiswa: Mahasiswa) => {
     try {
+      setIsDeleting(true);
+      toast.loading("Menghapus data mahasiswa...");
       await deleteMahasiswa(mahasiswa.nim);
+      toast.dismiss();
       toast.success("Data mahasiswa berhasil dihapus");
       if (selectedPeriodeId) {
-        await queryClient.invalidateQueries({
+        queryClient.invalidateQueries({
           queryKey: ["mahasiswa", selectedPeriodeId],
         });
       }
@@ -101,7 +107,10 @@ export function MahasiswaContent() {
       setMahasiswaToDelete(null);
     } catch (error) {
       console.error(error);
+      toast.dismiss();
       toast.error("Gagal menghapus data mahasiswa");
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -221,7 +230,10 @@ export function MahasiswaContent() {
           </div>
           {selectedPeriodeId && (
             <div className="mt-4 flex flex-wrap items-center gap-4">
-              <Dialog>
+              <Dialog
+                open={isImportDialogOpen}
+                onOpenChange={setIsImportDialogOpen}
+              >
                 <DialogTrigger asChild>
                   <Button variant="outline">
                     <Upload className="mr-2 h-4 w-4" />
@@ -234,7 +246,14 @@ export function MahasiswaContent() {
                   </DialogHeader>
                   <ExcelImport
                     periodeId={selectedPeriodeId}
-                    key={selectedPeriodeId}
+                    onSuccess={() => {
+                      setIsImportDialogOpen(false);
+                      queryClient.invalidateQueries({
+                        queryKey: ["mahasiswa", selectedPeriodeId],
+                        exact: true,
+                      });
+                      toast.success("Data mahasiswa berhasil diimpor");
+                    }}
                   />
                 </DialogContent>
               </Dialog>
@@ -250,10 +269,10 @@ export function MahasiswaContent() {
                 onOpenChange={setIsEditDialogOpen}
               >
                 <DialogTrigger asChild>
-            <Button>
-              <Plus className="mr-2 h-4 w-4" />
-              Tambah Mahasiswa
-            </Button>
+                  <Button>
+                    <Plus className="mr-2 h-4 w-4" />
+                    Tambah Mahasiswa
+                  </Button>
                 </DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
@@ -268,14 +287,16 @@ export function MahasiswaContent() {
                         : "Tambahkan data mahasiswa baru ke dalam sistem"}
                     </DialogDescription>
                   </DialogHeader>
-                  <MahasiswaForm
-                    initialData={selectedMahasiswa || undefined}
-                    periodeList={periodeList}
-                    onSuccess={handleSuccess}
-                  />
+                  <div className="max-h-[500px] overflow-y-auto">
+                    <MahasiswaForm
+                      initialData={selectedMahasiswa || undefined}
+                      periodeList={periodeList}
+                      onSuccess={handleSuccess}
+                    />
+                  </div>
                 </DialogContent>
               </Dialog>
-          </div>
+            </div>
           )}
         </CardHeader>
         <CardContent>
@@ -309,6 +330,7 @@ export function MahasiswaContent() {
                 setIsDeleteDialogOpen(false);
                 setMahasiswaToDelete(null);
               }}
+              disabled={isDeleting}
             >
               Batal
             </Button>
@@ -317,8 +339,10 @@ export function MahasiswaContent() {
               onClick={() =>
                 mahasiswaToDelete && handleDelete(mahasiswaToDelete)
               }
+              disabled={isDeleting}
             >
-              Hapus
+              {isDeleting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {isDeleting ? "Menghapus..." : "Hapus"}
             </Button>
           </DialogFooter>
         </DialogContent>

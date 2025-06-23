@@ -11,7 +11,6 @@ export const EXCEL_HEADERS = [
     "Prestasi Non-akademik (0-5)",
     "Perilaku (1-5)",
     "Keaktifan Organisasi (1-5)",
-    "ID Periode",
   ],
 ];
 
@@ -24,7 +23,6 @@ interface StudentData {
   prestasi_nonakademik: number;
   perilaku: number;
   keaktifan_organisasi: number;
-  periodeId_periode: string;
 }
 
 export function generateExcelTemplate() {
@@ -94,7 +92,6 @@ export function parseExcelFile(file: File): Promise<StudentData[]> {
           prestasi_nonakademik: Number(row["Prestasi Non-Akademik*"] || 0),
           perilaku: Number(row["Perilaku*"] || 0),
           keaktifan_organisasi: Number(row["Keaktifan Organisasi*"] || 0),
-          periodeId_periode: String(row["ID Periode*"] || ""),
         }));
 
         resolve(parsedData);
@@ -126,10 +123,6 @@ export function validateExcelData(data: StudentData[]): {
 
     if (!student.nama) {
       errors.push(`Baris ${rowNumber}: Nama wajib diisi`);
-    }
-
-    if (!student.periodeId_periode) {
-      errors.push(`Baris ${rowNumber}: ID Periode wajib diisi`);
     }
 
     if (student.nilai_akademik < 0 || student.nilai_akademik > 100) {

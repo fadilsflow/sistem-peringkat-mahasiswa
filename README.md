@@ -6,7 +6,7 @@ Sistem Pendukung Keputusan untuk menentukan peringkat mahasiswa di kelas menggun
 
 - Next.js (App Router)
 - Prisma (ORM)
-- SQLite (Database)
+- Postgresql (Database)
 - Shadcn/ui (Component Library)
 - Tailwind CSS (Styling)
 
