@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { createMahasiswa } from "@/lib/actions/mahasiswa";
+import { createMahasiswaBulk } from "@/lib/actions/mahasiswa";
 import {
   parseExcelFile,
   validateExcelData,
@@ -66,13 +66,14 @@ export default function ExcelImport({
         return;
       }
 
-      // Save data
-      for (const student of data) {
-        await createMahasiswa({
-          ...student,
-          periodeId_periode: periodeId,
-        });
-      }
+      // Prepare data for bulk import
+      const bulkData = data.map((student) => ({
+        ...student,
+        periodeId_periode: periodeId,
+      }));
+
+      // Save data in bulk
+      await createMahasiswaBulk(bulkData);
 
       toast.success("Data mahasiswa berhasil diimpor");
       onSuccess?.();

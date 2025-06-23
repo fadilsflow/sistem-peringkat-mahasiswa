@@ -183,3 +183,69 @@ export async function deleteMahasiswa(nim: string) {
     throw new Error("Gagal menghapus data mahasiswa");
   }
 }
+
+export async function createMahasiswaBulk(data: CreateMahasiswaData[]) {
+  try {
+    const { userId } = await auth();
+
+    if (!userId) {
+      throw new Error("Unauthorized");
+    }
+
+    // Get unique NIMs to check for duplicates
+    const nims = data.map((item) => item.nim);
+    const existingMahasiswa = await prisma.mahasiswa.findMany({
+      where: {
+        nim: {
+          in: nims,
+        },
+      },
+      select: {
+        nim: true,
+      },
+    });
+
+    if (existingMahasiswa.length > 0) {
+      throw new Error(
+        `Beberapa NIM sudah terdaftar: ${existingMahasiswa.map((m) => m.nim).join(", ")}`
+      );
+    }
+
+    // Check if periode exists and belongs to the current user
+    const periodeId = data[0]?.periodeId_periode;
+    if (!periodeId) {
+      throw new Error("Periode ID tidak valid");
+    }
+
+    const periode = await prisma.periode.findFirst({
+      where: {
+        id_periode: periodeId,
+        userId: userId,
+      },
+    });
+
+    if (!periode) {
+      throw new Error("Periode tidak ditemukan atau akses ditolak");
+    }
+
+    // Create all mahasiswa records in a single transaction
+    await prisma.$transaction(async (tx) => {
+      await tx.mahasiswa.createMany({
+        data: data.map((item) => ({
+          ...item,
+          tanggal_input: new Date(),
+        })),
+      });
+    });
+
+    revalidatePath("/mahasiswa");
+    revalidatePath("/hasil-saw");
+    revalidatePath("/dashboard");
+  } catch (error) {
+    console.error("Error creating mahasiswa bulk:", error);
+    if (error instanceof Error) {
+      throw error;
+    }
+    throw new Error("Gagal menyimpan data mahasiswa");
+  }
+}

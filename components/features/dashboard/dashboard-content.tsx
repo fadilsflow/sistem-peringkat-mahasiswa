@@ -60,6 +60,7 @@ export function DashboardContent() {
     isError: isStatsError,
     error: statsError,
     isLoading: isStatsLoading,
+    refetch: refetchStats,
   } = useDashboardStats(selectedPeriodeId);
 
   const {
@@ -67,6 +68,7 @@ export function DashboardContent() {
     isError: isMahasiswaError,
     error: mahasiswaError,
     isLoading: isMahasiswaLoading,
+    refetch: refetchMahasiswa,
   } = useMahasiswaByPeriode(selectedPeriodeId);
 
   // Set initial periode
@@ -102,7 +104,9 @@ export function DashboardContent() {
   }
 
   // Handle loading state
-  if (isPeriodeLoading || isStatsLoading || isMahasiswaLoading  ) {
+  if (isPeriodeLoading || isStatsLoading || isMahasiswaLoading) {
+    refetchStats();
+    refetchMahasiswa();
     return (
       <div className="space-y-6 md:p-0">
         <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">

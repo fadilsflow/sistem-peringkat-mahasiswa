@@ -23,6 +23,9 @@ async function fetchMahasiswaByPeriode(
     `/api/mahasiswa?periode=${encodeURIComponent(periodeId)}`
   );
   if (!response.ok) {
+    if (response.status === 404) {
+      return []; // Return empty array for non-existent periods
+    }
     throw new Error("Failed to fetch mahasiswa");
   }
   return response.json();

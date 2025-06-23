@@ -56,7 +56,7 @@ export async function createPeriode(data: {
     data: {
       ...data,
       userId: userId,
-    }
+    },
   });
   revalidatePath("/periode");
   revalidatePath("/dashboard");
@@ -94,27 +94,50 @@ export async function updatePeriode(
 }
 
 export async function deletePeriode(id: string) {
-  const { userId } = await auth();
+  try {
+    const { userId } = await auth();
 
-  if (!userId) {
-    throw new Error("Unauthorized");
+    if (!userId) {
+      throw new Error("Unauthorized");
+    }
+
+    // First check if the periode exists and belongs to the user
+    const periode = await prisma.periode.findFirst({
+      where: {
+        id_periode: id,
+        userId: userId,
+      },
+    });
+
+    if (!periode) {
+      throw new Error("Periode tidak ditemukan atau akses ditolak");
+    }
+
+    // Delete all mahasiswa records associated with this periode first
+    await prisma.$transaction(async (tx) => {
+      // Delete mahasiswa records
+      await tx.mahasiswa.deleteMany({
+        where: {
+          periodeId_periode: id,
+        },
+      });
+
+      // Delete the periode
+      await tx.periode.delete({
+        where: {
+          id_periode: id,
+          userId: userId,
+        },
+      });
+    });
+
+    revalidatePath("/periode");
+    revalidatePath("/dashboard");
+  } catch (error) {
+    console.error("Error deleting periode:", error);
+    if (error instanceof Error) {
+      throw error;
+    }
+    throw new Error("Gagal menghapus periode");
   }
-
-  // Delete all mahasiswa records associated with this periode first
-  await prisma.mahasiswa.deleteMany({
-    where: {
-      periodeId_periode: id,
-    },
-  });
-
-  // Then delete the periode
-  await prisma.periode.delete({
-    where: {
-      id_periode: id,
-      userId: userId,
-    },
-  });
-
-  revalidatePath("/periode");
-  revalidatePath("/dashboard");
 }

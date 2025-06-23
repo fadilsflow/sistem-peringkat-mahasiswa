@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -92,18 +92,33 @@ export function ManageContent() {
     error: periodeError,
   } = usePeriodes();
 
+  // Only fetch mahasiswa if we have a valid period selected
   const {
     data: mahasiswaList = [],
     isError: isMahasiswaError,
     error: mahasiswaError,
   } = useMahasiswaByPeriode(
-    selectedPeriodeId === "" ? null : selectedPeriodeId
+    // Only pass the periodeId if it exists in the current list
+    periodeList.some((p) => p.id_periode === selectedPeriodeId)
+      ? selectedPeriodeId
+      : null
   );
 
-  // Set initial periode
-  if (selectedPeriodeId === "" && periodeList.length > 0) {
-    setSelectedPeriodeId(periodeList[0].id_periode);
-  }
+  // Set initial periode only if we have periods and current selection is invalid
+  useEffect(() => {
+    if (periodeList.length > 0) {
+      // If no period is selected or selected period doesn't exist anymore
+      if (
+        !selectedPeriodeId ||
+        !periodeList.some((p) => p.id_periode === selectedPeriodeId)
+      ) {
+        setSelectedPeriodeId(periodeList[0].id_periode);
+      }
+    } else {
+      // If no periods exist, clear selection
+      setSelectedPeriodeId("");
+    }
+  }, [periodeList, selectedPeriodeId]);
 
   const handleSuccess = () => {
     // Close all dialogs
