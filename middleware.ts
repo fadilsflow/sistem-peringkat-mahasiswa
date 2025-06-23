@@ -1,7 +1,7 @@
 import { clerkMiddleware } from "@clerk/nextjs/server";
 
 export default clerkMiddleware({
-  authorizedParties: ["https://syncrank.bulba.cloud"],
+  authorizedParties: ["https://syncrank.bulba.cloud", "http://localhost:3000"],
 });
 
 export const config = {

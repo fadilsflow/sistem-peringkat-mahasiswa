@@ -55,28 +55,70 @@ export function DashboardContent() {
     isLoading: isPeriodeLoading,
   } = usePeriodes();
 
-  const {
-    data: stats,
-    isError: isStatsError,
-    error: statsError,
-    isLoading: isStatsLoading,
-    refetch: refetchStats,
-  } = useDashboardStats(selectedPeriodeId);
-
-  const {
-    data: mahasiswaList = [],
-    isError: isMahasiswaError,
-    error: mahasiswaError,
-    isLoading: isMahasiswaLoading,
-    refetch: refetchMahasiswa,
-  } = useMahasiswaByPeriode(selectedPeriodeId);
-
   // Set initial periode
   React.useEffect(() => {
     if (!isPeriodeLoading && periodeList.length > 0 && !selectedPeriodeId) {
       setSelectedPeriodeId(periodeList[0].id_periode);
     }
   }, [periodeList, isPeriodeLoading, selectedPeriodeId]);
+
+  // Handle loading state for periode
+  if (isPeriodeLoading) {
+    return (
+      <div className="h-110 flex flex-col items-center justify-center gap-4">
+        <h1 className="text-3xl sm:text-5xl font-bold tracking-tight text-primary">
+          Loading...
+        </h1>
+      </div>
+    );
+  }
+
+  // Handle no periode state
+  if (periodeList.length === 0 && !isPeriodeError) {
+    return (
+      <div className="h-110 flex flex-col items-center justify-center gap-4">
+        <h1 className="text-3xl sm:text-5xl font-bold tracking-tight text-primary">
+          Selamat Datang di SyncRank!
+        </h1>
+        <p className="text-muted-foreground text-lg text-center">
+          Anda Belum memiliki periode yang aktif. Silakan tambahkan periode
+          untuk memulai.
+        </p>
+        <Button asChild>
+          <Link href="/manage">Tambah Periode</Link>
+        </Button>
+      </div>
+    );
+  }
+
+  // Handle periode error
+  if (isPeriodeError) {
+    return (
+      <Alert variant="destructive">
+        <AlertCircle className="h-4 w-4" />
+        <AlertTitle>Error</AlertTitle>
+        <AlertDescription>
+          {(periodeError as Error)?.message ||
+            "Terjadi kesalahan saat memuat data periode"}
+        </AlertDescription>
+      </Alert>
+    );
+  }
+
+  // Only fetch dashboard and mahasiswa data if we have a selected period
+  const {
+    data: stats,
+    isError: isStatsError,
+    error: statsError,
+    isLoading: isStatsLoading,
+  } = useDashboardStats(selectedPeriodeId || null);
+
+  const {
+    data: mahasiswaList = [],
+    isError: isMahasiswaError,
+    error: mahasiswaError,
+    isLoading: isMahasiswaLoading,
+  } = useMahasiswaByPeriode(selectedPeriodeId || null);
 
   const activePeriode = periodeList.find(
     (p) => p.id_periode === selectedPeriodeId
@@ -87,15 +129,14 @@ export function DashboardContent() {
       ? getRanking(mahasiswaList, activePeriode).slice(0, 5)
       : [];
 
-  // Handle error states
-  if (isPeriodeError || isStatsError || isMahasiswaError) {
+  // Handle error states for dashboard and mahasiswa
+  if (isStatsError || isMahasiswaError) {
     return (
       <Alert variant="destructive">
         <AlertCircle className="h-4 w-4" />
         <AlertTitle>Error</AlertTitle>
         <AlertDescription>
-          {(periodeError as Error)?.message ||
-            (statsError as Error)?.message ||
+          {(statsError as Error)?.message ||
             (mahasiswaError as Error)?.message ||
             "Terjadi kesalahan saat memuat data"}
         </AlertDescription>
@@ -103,10 +144,8 @@ export function DashboardContent() {
     );
   }
 
-  // Handle loading state
-  if (isPeriodeLoading || isStatsLoading || isMahasiswaLoading) {
-    refetchStats();
-    refetchMahasiswa();
+  // Handle loading state for dashboard and mahasiswa
+  if (isStatsLoading || isMahasiswaLoading) {
     return (
       <div className="space-y-6 md:p-0">
         <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
@@ -131,24 +170,6 @@ export function DashboardContent() {
           <Skeleton className="h-100 w-full bg-card" />
           <Skeleton className="h-100 w-full bg-card" />
         </div>
-      </div>
-    );
-  }
-
-  // Handle no periode state
-  if (!isPeriodeLoading && periodeList.length === 0) {
-    return (
-      <div className="h-110 flex flex-col items-center justify-center gap-4">
-        <h1 className="text-3xl sm:text-5xl font-bold tracking-tight text-primary">
-          Selamat Datang di SyncRank!
-        </h1>
-        <p className="text-muted-foreground text-lg text-center">
-          Anda Belum memiliki periode yang aktif. Silakan tambahkan periode
-          untuk memulai.
-        </p>
-        <Button asChild>
-          <Link href="/manage">Tambah Periode</Link>
-        </Button>
       </div>
     );
   }
