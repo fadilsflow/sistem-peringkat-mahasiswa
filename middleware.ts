@@ -1,6 +1,8 @@
 import { clerkMiddleware } from "@clerk/nextjs/server";
 
-export default clerkMiddleware();
+export default clerkMiddleware({
+  authorizedParties: ["https://syncrank.bulba.cloud"],
+});
 
 export const config = {
   matcher: [
@@ -9,4 +11,4 @@ export const config = {
     // Always run for API routes
     "/(api|trpc)(.*)",
   ],
-}; 
+};

@@ -4,10 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "bunx prisma generate --no-engine && next build",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "postinstall": "bunx prisma generate --no-engine"
+    "postinstall": "prisma generate --no-engine"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.22.0",
