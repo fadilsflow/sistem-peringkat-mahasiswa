@@ -90,7 +90,7 @@ export default function HeroSection() {
         >
           <div className="w-full overflow-hidden rounded-xl border border-primary">
             <Image
-              src="/dash.png"
+              src="https://res.cloudinary.com/dxurnpbrc/image/upload/v1750670899/syncrank-dashboard_sxgeqt.png"
               alt="Dashboard preview"
               className="aspect-[16/9] w-full object-cover"
               height={500}
