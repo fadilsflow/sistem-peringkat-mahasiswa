@@ -1,11 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import { DataTable } from "./data-table";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { DataTable } from "@/components/shared/data-table";
 import { ColumnDef } from "@tanstack/react-table";
-import { Loader2 } from "lucide-react";
-
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface HasilSAW {
   nim: string;
@@ -20,15 +19,13 @@ interface HasilSAW {
   rank: number;
 }
 
-
-
 const columns: ColumnDef<HasilSAW>[] = [
   {
     accessorKey: "rank",
     header: "Peringkat",
   },
   {
-    accessorKey: "nim", 
+    accessorKey: "nim",
     header: "NIM",
   },
   {
@@ -104,7 +101,7 @@ export function HasilSawContent({ periodeId }: { periodeId: string }) {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <Loader2 className="h-8 w-8 animate-spin" />
+        <Skeleton className="h-100 w-full bg-card" />
       </div>
     );
   }

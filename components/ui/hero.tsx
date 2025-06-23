@@ -8,7 +8,7 @@ import Image from "next/image";
 import { Badge } from "./badge";
 import { Rocket } from "lucide-react";
 
-export default function HeroSection() {
+export default function Hero() {
   return (
     <div className="relative flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 mx-auto w-full">
       <div className="py-8 sm:py-12 md:py-16 lg:py-20">
@@ -21,7 +21,7 @@ export default function HeroSection() {
             <Badge variant="outline" className="text-primary">
               <Rocket className="h-3 w-3 sm:h-4 sm:w-4" />{" "}
               <span className="text-xs sm:text-sm font-bold">
-                Launching Now
+                Akurat & Cepat
               </span>
             </Badge>
           </motion.div>

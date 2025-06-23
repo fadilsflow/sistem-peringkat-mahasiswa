@@ -41,9 +41,10 @@ import {
   useMahasiswaByPeriode,
 } from "@/lib/hooks/use-queries";
 import { getRanking } from "@/lib/utils/saw";
-import { HasilSawContent } from "./hasil-saw-content";
+import { HasilSawContent } from "@/components/features/saw/hasil-saw-content";
 import Link from "next/link";
-import { Button } from "./ui/button";
+import { Button } from "@/components/ui/button";
+import React from "react";
 
 export function DashboardContent() {
   const [selectedPeriodeId, setSelectedPeriodeId] = useState<string>("");
@@ -51,6 +52,7 @@ export function DashboardContent() {
     data: periodeList = [],
     isError: isPeriodeError,
     error: periodeError,
+    isLoading: isPeriodeLoading,
   } = usePeriodes();
 
   const {
@@ -64,21 +66,26 @@ export function DashboardContent() {
     data: mahasiswaList = [],
     isError: isMahasiswaError,
     error: mahasiswaError,
+    isLoading: isMahasiswaLoading,
   } = useMahasiswaByPeriode(selectedPeriodeId);
 
   // Set initial periode
-  if (selectedPeriodeId === "" && periodeList.length > 0) {
-    setSelectedPeriodeId(periodeList[0].id_periode);
-  }
+  React.useEffect(() => {
+    if (!isPeriodeLoading && periodeList.length > 0 && !selectedPeriodeId) {
+      setSelectedPeriodeId(periodeList[0].id_periode);
+    }
+  }, [periodeList, isPeriodeLoading, selectedPeriodeId]);
 
   const activePeriode = periodeList.find(
     (p) => p.id_periode === selectedPeriodeId
   );
+
   const topMahasiswa =
     mahasiswaList.length > 0 && activePeriode
       ? getRanking(mahasiswaList, activePeriode).slice(0, 5)
       : [];
 
+  // Handle error states
   if (isPeriodeError || isStatsError || isMahasiswaError) {
     return (
       <Alert variant="destructive">
@@ -94,7 +101,38 @@ export function DashboardContent() {
     );
   }
 
-  if (!activePeriode) {
+  // Handle loading state
+  if (isPeriodeLoading || isStatsLoading || isMahasiswaLoading  ) {
+    return (
+      <div className="space-y-6 md:p-0">
+        <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
+          <div>
+            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-primary">
+              Dashboard
+            </h2>
+            <p className="text-muted-foreground text-sm">
+              Ringkasan data dan statistik mahasiswa
+            </p>
+          </div>
+          <Skeleton className="h-10 w-[200px]" />
+        </div>
+        <div className="grid gap-4 grid-cols-2 sm:grid-cols-2 lg:grid-cols-4">
+          {Array(4)
+            .fill(0)
+            .map((_, i) => (
+              <Skeleton key={i} className="h-40 w-full bg-card" />
+            ))}
+        </div>
+        <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
+          <Skeleton className="h-100 w-full bg-card" />
+          <Skeleton className="h-100 w-full bg-card" />
+        </div>
+      </div>
+    );
+  }
+
+  // Handle no periode state
+  if (!isPeriodeLoading && periodeList.length === 0) {
     return (
       <div className="h-110 flex flex-col items-center justify-center gap-4">
         <h1 className="text-3xl sm:text-5xl font-bold tracking-tight text-primary">
@@ -104,7 +142,6 @@ export function DashboardContent() {
           Anda Belum memiliki periode yang aktif. Silakan tambahkan periode
           untuk memulai.
         </p>
-
         <Button asChild>
           <Link href="/manage">Tambah Periode</Link>
         </Button>
@@ -112,8 +149,42 @@ export function DashboardContent() {
     );
   }
 
+  // Handle no active periode selected
+  if (!activePeriode) {
+    return (
+      <div className="space-y-6 md:p-0">
+        <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
+          <div>
+            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-primary">
+              Dashboard
+            </h2>
+            <p className="text-muted-foreground text-sm">
+              Silakan pilih periode untuk melihat data
+            </p>
+          </div>
+          <Select
+            value={selectedPeriodeId}
+            onValueChange={setSelectedPeriodeId}
+          >
+            <SelectTrigger className="w-full sm:w-[200px]">
+              <Calendar className="mr-2 h-4 w-4" />
+              <SelectValue placeholder="Pilih Periode" />
+            </SelectTrigger>
+            <SelectContent>
+              {periodeList.map((periode) => (
+                <SelectItem key={periode.id_periode} value={periode.id_periode}>
+                  {periode.tahun} Semester {periode.semester}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-6  md:p-0">
+    <div className="space-y-6 md:p-0">
       <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
         <div>
           <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-primary">
@@ -139,84 +210,66 @@ export function DashboardContent() {
       </div>
 
       <div className="grid gap-4 grid-cols-2 sm:grid-cols-2 lg:grid-cols-4">
-        {isStatsLoading ? (
-          Array(4)
-            .fill(0)
-            .map((_, i) => (
-              <Card key={i}>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <Skeleton className="h-4 w-[100px]" />
-                </CardHeader>
-                <CardContent>
-                  <Skeleton className="h-8 w-[60px]" />
-                </CardContent>
-              </Card>
-            ))
-        ) : (
-          <>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-xs md:text-sm font-medium">
-                  Total Mahasiswa
-                </CardTitle>
-                <Users className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-xl md:text-2xl font-bold">
-                  {stats?.totalMahasiswa || 0}
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  mahasiswa terdaftar
-                </p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-xs md:text-sm font-medium">
-                  Rata-rata Nilai
-                </CardTitle>
-                <TrendingUp className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-lg md:text-xl font-bold">
-                  {stats?.avgNilaiAkademik?.toFixed(2) || "0.00"}
-                </div>
-                <Progress
-                  value={stats?.avgNilaiAkademik || 0}
-                  className="mt-2"
-                />
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-xs md:text-sm font-medium">
-                  Rata-rata Kehadiran
-                </CardTitle>
-                <ArrowUp className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-lg md:text-xl font-bold">
-                  {stats?.avgKehadiran?.toFixed(2) || "0.00"}%
-                </div>
-                <Progress value={stats?.avgKehadiran || 0} className="mt-2" />
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-xs md:text-sm font-medium">
-                  Rata-rata Prestasi
-                </CardTitle>
-                <Award className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-lg md:text-xl font-bold">
-                  {stats?.avgPrestasi?.toFixed(2) || "0.00"}
-                </div>
-                <Progress value={stats?.avgPrestasi || 0} className="mt-2" />
-              </CardContent>
-            </Card>
-          </>
-        )}
+        <>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-xs md:text-sm font-medium">
+                Total Mahasiswa
+              </CardTitle>
+              <Users className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-xl md:text-2xl font-bold">
+                {stats?.totalMahasiswa || 0}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                mahasiswa terdaftar
+              </p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-xs md:text-sm font-medium">
+                Rata-rata Nilai
+              </CardTitle>
+              <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-lg md:text-xl font-bold">
+                {stats?.avgNilaiAkademik?.toFixed(2) || "0.00"}
+              </div>
+              <Progress value={stats?.avgNilaiAkademik || 0} className="mt-2" />
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-xs md:text-sm font-medium">
+                Rata-rata Kehadiran
+              </CardTitle>
+              <ArrowUp className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-lg md:text-xl font-bold">
+                {stats?.avgKehadiran?.toFixed(2) || "0.00"}%
+              </div>
+              <Progress value={stats?.avgKehadiran || 0} className="mt-2" />
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-xs md:text-sm font-medium">
+                Rata-rata Prestasi
+              </CardTitle>
+              <Award className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-lg md:text-xl font-bold">
+                {stats?.avgPrestasi?.toFixed(2) || "0.00"}
+              </div>
+              <Progress value={stats?.avgPrestasi || 0} className="mt-2" />
+            </CardContent>
+          </Card>
+        </>
       </div>
 
       <div className="grid gap-4 grid-cols-1 md:grid-cols-2">

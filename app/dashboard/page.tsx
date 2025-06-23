@@ -1,6 +1,6 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import { DashboardContent } from "@/components/dashboard-content";
+import { DashboardContent } from "@/components/features/dashboard/dashboard-content";
 
 export default async function DashboardPage() {
   const { userId } = await auth();

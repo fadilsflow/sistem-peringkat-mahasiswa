@@ -18,7 +18,7 @@ import {
   DialogTrigger,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { DataTable } from "@/components/data-table";
+import { DataTable } from "@/components/shared/data-table";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   AlertCircle,
@@ -28,10 +28,10 @@ import {
   MoreHorizontal,
   Loader2,
 } from "lucide-react";
-import { MahasiswaForm } from "./mahasiswa-form";
-import { PeriodeForm } from "./periode-form";
-import ExcelImport from "./excel-import";
-import ExcelExport from "./excel-export";
+import { MahasiswaForm } from "@/components/forms/mahasiswa-form";
+import { PeriodeForm } from "@/components/forms/periode-form";
+import ExcelImport from "@/components/shared/excel-import";
+import ExcelExport from "@/components/shared/excel-export";
 import {
   Select,
   SelectContent,
@@ -384,6 +384,7 @@ export function ManageContent() {
                     Tambahkan periode penilaian baru ke dalam sistem
                   </DialogDescription>
                 </DialogHeader>
+                
                 <PeriodeForm onSuccess={handleSuccess} />
               </DialogContent>
             </Dialog>

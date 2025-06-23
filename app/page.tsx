@@ -1,6 +1,6 @@
 import HeroSectionOne from "@/components/ui/hero";
 import FeaturesSection from "@/components/ui/features-section";
-import CTA from "@/components/cta";
+import CTA from "@/components/shared/cta";
 
 export default function Home() {
   return (

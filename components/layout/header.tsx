@@ -2,8 +2,9 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
-import { Button } from "./ui/button";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
 
 export function Header() {
   const pathname = usePathname();
@@ -22,11 +23,16 @@ export function Header() {
     >
       <div className="container mx-auto px-4 sm:px-10">
         <div className="flex h-12 items-center justify-between">
-          <div className="flex items-center gap-6">
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2 }}
+            className="flex items-center gap-6"
+          >
             <Link href="/" className="flex items-center text-primary">
               <span className="font-bold">SYNCRANK</span>
             </Link>
-          </div>
+          </motion.div>
           <div className="flex gap-4 items-center">
             <SignedOut>
               <SignInButton mode="modal">
@@ -47,7 +53,7 @@ export function Header() {
                     <Link
                       key={item.href}
                       href={item.href}
-                      className={`px-3 py-3.5 text-sm font-light transition-colors text-primary hover:text-primary hover:bg-muted/50 ${
+                      className={` px-2 md:px-3 py-2 md:py-3.5  text-[10px] md:text-sm font-light transition-colors text-primary hover:text-primary hover:bg-muted/50 ${
                         pathname === item.href
                           ? " text-primary border-b-2 border-primary"
                           : ""

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Periode } from "@prisma/client";
 import { deletePeriode } from "@/lib/actions/periode";
-import { PeriodeForm } from "@/components/periode-form";
+import { PeriodeForm } from "@/components/forms/periode-form";
 import {
   Dialog,
   DialogContent,
@@ -26,7 +26,7 @@ import { AlertCircle, Plus, Pencil, Trash } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { usePeriodes } from "@/lib/hooks/use-queries";
 import { useQueryClient } from "@tanstack/react-query";
-import { DataTable } from "@/components/data-table";
+import { DataTable } from "@/components/shared/data-table";
 import type { ColumnDef } from "@tanstack/react-table";
 
 export function PeriodeContent() {
@@ -151,7 +151,7 @@ export function PeriodeContent() {
 
   return (
     <div className="space-y-6">
-          <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between">
         <h2 className="text-3xl font-bold tracking-tight">Manajemen Periode</h2>
         <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
           <DialogTrigger asChild>
@@ -177,7 +177,7 @@ export function PeriodeContent() {
             />
           </DialogContent>
         </Dialog>
-          </div>
+      </div>
 
       {periodeList.length === 0 ? (
         <Card>
@@ -196,16 +196,16 @@ export function PeriodeContent() {
             <CardDescription>
               Daftar periode yang tersedia dalam sistem
             </CardDescription>
-        </CardHeader>
-        <CardContent>
+          </CardHeader>
+          <CardContent>
             <DataTable
               columns={columns}
               data={periodeList}
               filterColumn="id_periode"
               filterPlaceholder="Filter ID periode..."
             />
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
       )}
 
       {/* Delete Confirmation Dialog */}
