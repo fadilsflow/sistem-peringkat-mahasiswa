@@ -1,0 +1,10 @@
+# Allow all crawlers
+User-agent: *
+Allow: /
+Allow: /about
+Disallow: /dashboard
+Disallow: /manage
+Disallow: /api/*
+
+# Sitemap
+Sitemap: https://syncrank.bulba.cloud/sitemap.xml 

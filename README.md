@@ -1,158 +1,132 @@
-# Sistem Pendukung Keputusan Peringkat Mahasiswa (SAW Method)
+# SyncRank 🎓
 
-Sistem Pendukung Keputusan untuk menentukan peringkat mahasiswa di kelas menggunakan metode Simple Additive Weighting (SAW). Aplikasi ini dibangun menggunakan Next.js, Prisma, dan SQLite.
+<div align="center">
+  <img src="https://res.cloudinary.com/dxurnpbrc/image/upload/v1750670899/syncrank-dashboard_sxgeqt.png" alt="SyncRank Dashboard" width="100%" />
+  
+  <h3>Sistem Peringkat Mahasiswa dengan Metode SAW</h3>
 
-## Teknologi yang Digunakan
+  <p>Platform modern untuk mengelola dan mengevaluasi prestasi akademik mahasiswa menggunakan metode Simple Additive Weighting (SAW)</p>
 
-- Next.js (App Router)
-- Prisma (ORM)
-- Postgresql (Database)
-- Shadcn/ui (Component Library)
-- Tailwind CSS (Styling)
+  <p>
+    <a href="https://syncrank.bulba.cloud">View Demo</a>
+    ·
+    <a href="https://github.com/fadilsflow/sistem-peringkat-mahasiswa/issues">Report Bug</a>
+    ·
+    <a href="https://github.com/fadilsflow/sistem-peringkat-mahasiswa/issues">Request Feature</a>
+  </p>
+</div>
 
-## Fitur Utama
+## ✨ Features
 
-1. **Manajemen Periode**
+- 📊 **Dashboard Interaktif** - Visualisasi data dan statistik mahasiswa
+- 🎯 **Manajemen Periode** - Atur periode dan bobot kriteria penilaian
+- 👥 **Manajemen Mahasiswa** - Kelola data dan nilai mahasiswa
+- 📈 **Perhitungan SAW** - Evaluasi otomatis menggunakan metode SAW
+- 🔒 **Autentikasi** - Keamanan data dengan Clerk Auth
+- 🎨 **UI Modern** - Antarmuka yang intuitif dengan Shadcn/ui
 
-   - Menambah, mengubah, dan menghapus periode penilaian
-   - Mengatur bobot kriteria penilaian untuk setiap periode
-   - Melihat daftar periode yang tersedia
+## 🛠️ Tech Stack
 
-2. **Manajemen Data Mahasiswa**
+- [Next.js 14](https://nextjs.org/) - Framework React
+- [Prisma](https://www.prisma.io/) - ORM
+- [PostgreSQL](https://www.postgresql.org/) - Database
+- [Shadcn/ui](https://ui.shadcn.com/) - Komponen UI
+- [Tailwind CSS](https://tailwindcss.com/) - Styling
+- [Clerk](https://clerk.com/) - Autentikasi
 
-   - Input data mahasiswa (NIM, Nama)
-   - Input nilai kriteria penilaian:
-     - Nilai Akademik (0-100)
-     - Kehadiran (0-100%)
-     - Prestasi Akademik (0-5)
-     - Prestasi Non-akademik (0-5)
-     - Perilaku (1-5)
-     - Keaktifan Organisasi (1-5)
+## 🚀 Quick Start
 
-3. **Perhitungan SAW**
-   - Normalisasi nilai kriteria
-   - Perhitungan nilai akhir berdasarkan bobot
-   - Menampilkan peringkat mahasiswa
+1. **Clone repository**
 
-## Kriteria Penilaian
+```bash
+git clone https://github.com/fadilsflow/sistem-peringkat-mahasiswa.git
+cd sistem-peringkat-mahasiswa
+```
 
-### 1. Prestasi Akademik
-
-| Jenis Prestasi                            | Skor |
-| ----------------------------------------- | ---- |
-| Tidak ada prestasi                        | 0    |
-| Peserta lomba/seminar                     | 1    |
-| Juara 1-3 tingkat lokal/kampus            | 2    |
-| Juara 1–3 tingkat kampus/daerah           | 3    |
-| Juara tingkat nasional / publikasi ilmiah | 4    |
-| Juara internasional / publikasi terindeks | 5    |
-
-### 2. Prestasi Non-akademik
-
-| Jenis Prestasi                    | Skor |
-| --------------------------------- | ---- |
-| Tidak ada prestasi                | 0    |
-| Partisipan lomba non-akademik     | 1    |
-| Juara 1-3 di tingkat lokal/kampus | 2    |
-| Juara 1–3 tingkat daerah          | 3    |
-| Juara tingkat nasional            | 4    |
-| Juara tingkat internasional       | 5    |
-
-### 3. Keaktifan Organisasi
-
-| Skor | Jenis Keaktifan                                                                      |
-| ---- | ------------------------------------------------------------------------------------ |
-| 1    | Tidak aktif sama sekali atau hanya menjadi anggota pasif (jarang hadir)              |
-| 2    | Aktif sebagai anggota biasa dalam 1 organisasi                                       |
-| 3    | Aktif sebagai pengurus (anggota divisi) di 1–2 organisasi                            |
-| 4    | Menjabat sebagai koordinator/bidang atau pengurus inti (sekretaris, bendahara, dsb)  |
-| 5    | Menjabat ketua/presiden organisasi atau aktif di >1 organisasi sebagai pengurus inti |
-
-## Struktur Database
-
-### Tabel Periode
-
-- id_periode (Primary Key)
-- tahun
-- semester
-- Bobot kriteria:
-  - w1_nilai_akademik
-  - w2_kehadiran
-  - w3_prestasi_akademik
-  - w4_prestasi_nonakademik
-  - w5_perilaku
-  - w6_keaktifan_organisasi
-- deskripsi
-
-### Tabel Mahasiswa
-
-- nim (Primary Key)
-- nama
-- id_periode (Foreign Key)
-- nilai_akademik
-- kehadiran
-- prestasi_akademik
-- prestasi_nonakademik
-- perilaku
-- keaktifan_organisasi
-- tanggal_input
-
-## Metode SAW (Simple Additive Weighting)
-
-1. **Normalisasi Matrix**
-
-   - Untuk kriteria benefit: r[ij] = x[ij] / max(x[i])
-   - Untuk kriteria cost: r[ij] = min(x[i]) / x[ij]
-
-2. **Perhitungan Nilai Akhir**
-   - V[i] = Σ(w[j] \* r[ij])
-   - w[j] = bobot kriteria
-   - r[ij] = nilai normalisasi
-
-## Komponen UI
-
-1. **Dashboard**
-
-   - Ringkasan data periode aktif
-   - Statistik jumlah mahasiswa
-   - Quick actions
-
-2. **Manajemen Periode**
-
-   - Form input/edit periode
-   - Tabel daftar periode
-   - Input bobot kriteria
-
-3. **Data Mahasiswa**
-
-   - Form input/edit mahasiswa
-   - Tabel daftar mahasiswa
-   - Filter berdasarkan periode
-
-4. **Hasil SAW**
-   - Tabel peringkat mahasiswa
-   - Detail perhitungan
-   - Filter berdasarkan periode
-
-## Cara Menjalankan Aplikasi
-
-1. Install dependencies:
+2. **Install dependencies**
 
 ```bash
 bun install
 ```
 
-2. Setup database:
+3. **Setup environment variables**
+
+```bash
+cp .env.example .env
+```
+
+Edit `.env` file dengan konfigurasi yang sesuai:
+
+```env
+DATABASE_URL="postgresql://..."
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY="pk_..."
+CLERK_SECRET_KEY="sk_..."
+```
+
+4. **Setup database**
 
 ```bash
 bunx prisma generate
 bunx prisma db push
 ```
 
-3. Jalankan aplikasi:
+5. **Run development server**
 
 ```bash
 bun dev
 ```
 
-Aplikasi akan berjalan di `http://localhost:3000`
+Buka [http://localhost:3000](http://localhost:3000) di browser.
+
+## 📝 Kriteria Penilaian
+
+### Prestasi Akademik (0-5)
+
+- Tidak ada prestasi (0)
+- Peserta lomba/seminar (1)
+- Juara 1-3 tingkat kampus (2)
+- Juara 1-3 tingkat daerah (3)
+- Juara nasional/publikasi (4)
+- Juara internasional (5)
+
+### Prestasi Non-akademik (0-5)
+
+- Tidak ada prestasi (0)
+- Partisipan lomba (1)
+- Juara kampus (2)
+- Juara daerah (3)
+- Juara nasional (4)
+- Juara internasional (5)
+
+### Keaktifan Organisasi (1-5)
+
+- Anggota pasif (1)
+- Anggota aktif (2)
+- Pengurus divisi (3)
+- Pengurus inti (4)
+- Ketua/multi organisasi (5)
+
+## 🤝 Contributing
+
+Kontribusi membuat komunitas open source menjadi tempat yang luar biasa untuk belajar dan berkreasi. Setiap kontribusi yang Anda buat akan sangat **dihargai**.
+
+1. Fork project ini
+2. Buat branch fitur Anda (`git checkout -b feature/AmazingFeature`)
+3. Commit perubahan Anda (`git commit -m 'Add some AmazingFeature'`)
+4. Push ke branch (`git push origin feature/AmazingFeature`)
+5. Buka Pull Request
+
+## 📄 License
+
+Distributed under the MIT License. See `LICENSE` for more information.
+
+## 👤 Author
+
+**Fadil**
+
+- Website: [fadils.xyz](https://fadils.xyz)
+- GitHub: [@fadilsflow](https://github.com/fadilsflow)
+
+## ⭐️ Show your support
+
+Berikan ⭐️ jika project ini membantu Anda!
