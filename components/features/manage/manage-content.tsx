@@ -24,7 +24,6 @@ import {
   AlertCircle,
   Plus,
   Upload,
-  Download,
   MoreHorizontal,
   Loader2,
   Calendar,
@@ -505,13 +504,7 @@ export function ManageContent() {
                   />
                 </DialogContent>
               </Dialog>
-              <Button
-                variant="outline"
-                onClick={() => ExcelExport({ data: mahasiswaList })}
-              >
-                <Download className="mr-2 h-4 w-4" />
-                Export Excel
-              </Button>
+              <ExcelExport data={mahasiswaList} />
               <Dialog>
                 <DialogTrigger asChild>
                   <Button>

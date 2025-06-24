@@ -18,7 +18,6 @@ import {
   AlertCircle,
   Plus,
   Upload,
-  Download,
   School,
   Pencil,
   Trash,
@@ -261,13 +260,7 @@ export function MahasiswaContent() {
                   />
                 </DialogContent>
               </Dialog>
-              <Button
-                variant="outline"
-                onClick={() => ExcelExport({ data: mahasiswaList })}
-              >
-                <Download className="mr-2 h-4 w-4" />
-                Export Excel
-              </Button>
+              <ExcelExport data={mahasiswaList} />
               <Dialog
                 open={isEditDialogOpen}
                 onOpenChange={setIsEditDialogOpen}
