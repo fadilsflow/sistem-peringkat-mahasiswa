@@ -249,68 +249,50 @@ export async function createMahasiswaBulk(data: CreateMahasiswaData[]) {
       throw new Error("Periode tidak ditemukan atau akses ditolak");
     }
 
-    // Check for existing mahasiswa in this period
-    const nims = data.map((item) => item.nim);
-    const existingMahasiswa = await prisma.mahasiswa.findMany({
-      where: {
-        AND: [
-          { nim: { in: nims } },
-          { periodeId_periode: periodeId },
-          {
-            periode: {
-              userId: userId,
-            },
-          },
-        ],
-      },
-      select: {
-        nim: true,
-      },
-    });
+    // Process records individually to avoid transaction timeouts
+    for (const item of data) {
+      // Check if mahasiswa already exists in this period
+      const existingMahasiswa = await prisma.mahasiswa.findFirst({
+        where: {
+          nim: item.nim,
+          periodeId_periode: periodeId,
+        },
+      });
 
-    if (existingMahasiswa.length > 0) {
-      throw new Error(
-        `Beberapa NIM sudah terdaftar di periode ini: ${existingMahasiswa
-          .map((m) => m.nim)
-          .join(", ")}`
-      );
-    }
+      if (existingMahasiswa) {
+        throw new Error(
+          `Mahasiswa dengan NIM ${item.nim} sudah ada di periode ini`
+        );
+      }
 
-    // Create all mahasiswa records in a single transaction
-    await prisma.$transaction(async (tx) => {
-      for (const item of data) {
-        await tx.mahasiswa.create({
-          data: {
-            nim: item.nim,
-            nama: item.nama,
-            nilai_akademik: item.nilai_akademik,
-            kehadiran: item.kehadiran,
-            prestasi_akademik: item.prestasi_akademik,
-            prestasi_nonakademik: item.prestasi_nonakademik,
-            perilaku: item.perilaku,
-            keaktifan_organisasi: item.keaktifan_organisasi,
-            tanggal_input: new Date(),
-            periode: {
-              connect: {
-                id_periode_userId: {
-                  id_periode: item.periodeId_periode,
-                  userId: userId,
-                },
+      await prisma.mahasiswa.create({
+        data: {
+          nim: item.nim,
+          nama: item.nama,
+          nilai_akademik: item.nilai_akademik,
+          kehadiran: item.kehadiran,
+          prestasi_akademik: item.prestasi_akademik,
+          prestasi_nonakademik: item.prestasi_nonakademik,
+          perilaku: item.perilaku,
+          keaktifan_organisasi: item.keaktifan_organisasi,
+          tanggal_input: new Date(),
+          periode: {
+            connect: {
+              id_periode_userId: {
+                id_periode: item.periodeId_periode,
+                userId: userId,
               },
             },
           },
-        });
-      }
-    });
+        },
+      });
+    }
 
     revalidatePath("/mahasiswa");
     revalidatePath("/hasil-saw");
     revalidatePath("/dashboard");
   } catch (error) {
     console.error("Error creating mahasiswa bulk:", error);
-    if (error instanceof Error) {
-      throw error;
-    }
-    throw new Error("Gagal menyimpan data mahasiswa");
+    throw error;
   }
 }
