@@ -1,5 +1,3 @@
-"use client";
-
 type JsonLdData = {
   "@context": string;
   "@type": string;
