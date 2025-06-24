@@ -44,3 +44,22 @@ model Periode {
   mahasiswa               Mahasiswa[]
   userId                  String
 }
+
+model AIChatSession {
+  id        String          @id @default(uuid())
+  userId    String
+  title     String
+  createdAt DateTime        @default(now())
+  messages  AIChatMessage[]
+}
+
+model AIChatMessage {
+  id        String        @id @default(uuid())
+  session   AIChatSession @relation(fields: [sessionId], references: [id])
+  sessionId String
+  role      String // "user" | "assistant"
+  content   String        @db.Text
+  createdAt DateTime      @default(now())
+
+  @@index([sessionId])
+}
