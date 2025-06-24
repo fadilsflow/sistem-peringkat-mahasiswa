@@ -157,18 +157,49 @@ export function validateExcelData(data: StudentData[]): {
 }
 
 export function exportToExcel(data: Mahasiswa[], filename: string) {
+  // Format data for export
+  const formattedData = data.map((item) => ({
+    NIM: item.nim,
+    Nama: item.nama,
+    "Nilai Akademik": item.nilai_akademik,
+    "Kehadiran (%)": item.kehadiran,
+    "Prestasi Akademik": item.prestasi_akademik,
+    "Prestasi Non-akademik": item.prestasi_nonakademik,
+    Perilaku: item.perilaku,
+    "Keaktifan Organisasi": item.keaktifan_organisasi,
+    "Tanggal Input": item.tanggal_input.toLocaleDateString("id-ID", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    }),
+    "ID Periode": item.periodeId_periode,
+  }));
+
   // Create a new workbook
   const workbook = XLSX.utils.book_new();
 
   // Convert data to worksheet
-  const worksheet = XLSX.utils.json_to_sheet(data);
+  const worksheet = XLSX.utils.json_to_sheet(formattedData, {
+    header: [
+      "NIM",
+      "Nama",
+      "Nilai Akademik",
+      "Kehadiran (%)",
+      "Prestasi Akademik",
+      "Prestasi Non-akademik",
+      "Perilaku",
+      "Keaktifan Organisasi",
+      "Tanggal Input",
+      "ID Periode",
+    ],
+  });
 
   // Set column widths
-  const colWidths = [15, 30, 15, 15, 20, 25, 15, 20, 15];
+  const colWidths = [15, 30, 15, 15, 20, 25, 15, 20, 25, 15];
   worksheet["!cols"] = colWidths.map((width) => ({ width }));
 
   // Add worksheet to workbook
-  XLSX.utils.book_append_sheet(workbook, worksheet, "Data");
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Data Mahasiswa");
 
   // Write to file
   XLSX.writeFile(workbook, filename);

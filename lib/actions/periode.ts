@@ -46,6 +46,7 @@ export async function createPeriode(data: {
   w5_perilaku: number;
   w6_keaktifan_organisasi: number;
   deskripsi: string;
+  userId: string;
 }) {
   const { userId } = await auth();
 
@@ -53,14 +54,21 @@ export async function createPeriode(data: {
     throw new Error("Unauthorized");
   }
 
-  await prisma.periode.create({
-    data: {
-      ...data,
-      userId: userId,
-    },
-  });
-  revalidatePath("/periode");
-  revalidatePath("/dashboard");
+  try {
+    await prisma.periode.create({
+      data: {
+        ...data,
+        userId: userId,
+      },
+    });
+    revalidatePath("/periode");
+    revalidatePath("/dashboard");
+  } catch (error: any) {
+    if (error.code === "P2002") {
+      throw new Error("Periode dengan ID tersebut sudah ada untuk user ini");
+    }
+    throw error;
+  }
 }
 
 export async function updatePeriode(
@@ -76,6 +84,7 @@ export async function updatePeriode(
     w5_perilaku: number;
     w6_keaktifan_organisasi: number;
     deskripsi: string;
+    userId: string;
   }
 ) {
   const { userId } = await auth();
@@ -92,6 +101,7 @@ export async function updatePeriode(
       const mahasiswaList = await prisma.mahasiswa.findMany({
         where: {
           periodeId_periode: id,
+          userId: userId,
         },
       });
 
@@ -101,6 +111,7 @@ export async function updatePeriode(
           ? await prisma.mahasiswa.findMany({
               where: {
                 periodeId_periode: data.id_periode,
+                userId: userId,
                 nim: {
                   in: mahasiswaList.map((m) => m.nim),
                 },
@@ -123,18 +134,22 @@ export async function updatePeriode(
         await tx.mahasiswa.deleteMany({
           where: {
             periodeId_periode: id,
+            userId: userId,
           },
         });
 
         // Update data periode (termasuk id_periode jika berubah)
         const updatedPeriode = await tx.periode.update({
           where: {
-            id_periode: id,
-            userId: userId,
+            id_periode_userId: {
+              id_periode: id,
+              userId: userId,
+            },
           },
           data: {
             ...data,
             id_periode: data.id_periode,
+            userId: userId,
           },
         });
 
@@ -143,16 +158,9 @@ export async function updatePeriode(
           // Gunakan createMany untuk batch insert
           await tx.mahasiswa.createMany({
             data: mahasiswaList.map((mahasiswa) => ({
-              nim: mahasiswa.nim,
-              nama: mahasiswa.nama,
-              nilai_akademik: mahasiswa.nilai_akademik,
-              kehadiran: mahasiswa.kehadiran,
-              prestasi_akademik: mahasiswa.prestasi_akademik,
-              prestasi_nonakademik: mahasiswa.prestasi_nonakademik,
-              perilaku: mahasiswa.perilaku,
-              keaktifan_organisasi: mahasiswa.keaktifan_organisasi,
-              tanggal_input: mahasiswa.tanggal_input,
+              ...mahasiswa,
               periodeId_periode: data.id_periode!,
+              userId: userId,
             })),
           });
         }
@@ -168,14 +176,26 @@ export async function updatePeriode(
     }
   } else {
     // Jika id_periode tidak berubah, update biasa
-    const { ...updateData } = data;
-    await prisma.periode.update({
-      where: {
-        id_periode: id,
-        userId: userId,
-      },
-      data: updateData,
-    });
+    try {
+      const { id_periode, ...updateData } = data;
+      await prisma.periode.update({
+        where: {
+          id_periode_userId: {
+            id_periode: id,
+            userId: userId,
+          },
+        },
+        data: {
+          ...updateData,
+          userId: userId,
+        },
+      });
+    } catch (error: any) {
+      if (error.code === "P2002") {
+        throw new Error("Periode dengan ID tersebut sudah ada untuk user ini");
+      }
+      throw error;
+    }
   }
 
   // Pastikan tetap revalidate path setelah update
@@ -210,14 +230,17 @@ export async function deletePeriode(id: string) {
       await tx.mahasiswa.deleteMany({
         where: {
           periodeId_periode: id,
+          userId: userId,
         },
       });
 
       // Delete the periode
       await tx.periode.delete({
         where: {
-          id_periode: id,
-          userId: userId,
+          id_periode_userId: {
+            id_periode: id,
+            userId: userId,
+          },
         },
       });
     });

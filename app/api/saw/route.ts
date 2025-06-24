@@ -8,10 +8,7 @@ export async function GET(request: Request) {
     const { userId } = await auth();
 
     if (!userId) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { searchParams } = new URL(request.url);
@@ -33,72 +30,88 @@ export async function GET(request: Request) {
     });
 
     if (!periode) {
-      return NextResponse.json({ error: "Periode not found or access denied" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Periode not found or access denied" },
+        { status: 404 }
+      );
     }
 
-    // Get mahasiswa data
+    // Get mahasiswa data with userId filter
     const mahasiswa = await prisma.mahasiswa.findMany({
-      where: { periodeId_periode: periodeId },
+      where: {
+        periodeId_periode: periodeId,
+        userId: userId,
+      },
     });
 
     if (mahasiswa.length === 0) {
       return NextResponse.json([]);
     }
 
-    // Get max values for normalization
+    // Get max values for normalization (ensure non-zero values)
     const maxValues = {
       nilai_akademik: Math.max(
-        ...mahasiswa.map((m: Mahasiswa) => m.nilai_akademik)
+        1,
+        ...mahasiswa.map((m: Mahasiswa) => m.nilai_akademik || 0)
       ),
-      kehadiran: Math.max(...mahasiswa.map((m: Mahasiswa) => m.kehadiran)),
+      kehadiran: Math.max(
+        1,
+        ...mahasiswa.map((m: Mahasiswa) => m.kehadiran || 0)
+      ),
       prestasi_akademik: Math.max(
-        ...mahasiswa.map((m: Mahasiswa) => m.prestasi_akademik)
+        1,
+        ...mahasiswa.map((m: Mahasiswa) => m.prestasi_akademik || 0)
       ),
       prestasi_nonakademik: Math.max(
-        ...mahasiswa.map((m: Mahasiswa) => m.prestasi_nonakademik)
+        1,
+        ...mahasiswa.map((m: Mahasiswa) => m.prestasi_nonakademik || 0)
       ),
-      perilaku: Math.max(...mahasiswa.map((m: Mahasiswa) => m.perilaku)),
+      perilaku: Math.max(
+        1,
+        ...mahasiswa.map((m: Mahasiswa) => m.perilaku || 0)
+      ),
       keaktifan_organisasi: Math.max(
-        ...mahasiswa.map((m: Mahasiswa) => m.keaktifan_organisasi)
+        1,
+        ...mahasiswa.map((m: Mahasiswa) => m.keaktifan_organisasi || 0)
       ),
     };
 
     // Calculate normalized values and final scores
     const results = mahasiswa.map((m: Mahasiswa) => {
-      // Normalize values (value / max_value)
+      // Normalize values (value / max_value) with null checks
       const normalized = {
-        nilai_akademik: m.nilai_akademik / maxValues.nilai_akademik,
-        kehadiran: m.kehadiran / maxValues.kehadiran,
-        prestasi_akademik: m.prestasi_akademik / maxValues.prestasi_akademik,
+        nilai_akademik: (m.nilai_akademik || 0) / maxValues.nilai_akademik,
+        kehadiran: (m.kehadiran || 0) / maxValues.kehadiran,
+        prestasi_akademik:
+          (m.prestasi_akademik || 0) / maxValues.prestasi_akademik,
         prestasi_nonakademik:
-          m.prestasi_nonakademik / maxValues.prestasi_nonakademik,
-        perilaku: m.perilaku / maxValues.perilaku,
+          (m.prestasi_nonakademik || 0) / maxValues.prestasi_nonakademik,
+        perilaku: (m.perilaku || 0) / maxValues.perilaku,
         keaktifan_organisasi:
-          m.keaktifan_organisasi / maxValues.keaktifan_organisasi,
+          (m.keaktifan_organisasi || 0) / maxValues.keaktifan_organisasi,
       };
 
       // Calculate final score
       const final_score =
-        normalized.nilai_akademik * periode.w1_nilai_akademik +
-        normalized.kehadiran * periode.w2_kehadiran +
-        normalized.prestasi_akademik * periode.w3_prestasi_akademik +
-        normalized.prestasi_nonakademik * periode.w4_prestasi_nonakademik +
-        normalized.perilaku * periode.w5_perilaku +
-        normalized.keaktifan_organisasi * periode.w6_keaktifan_organisasi;
+        normalized.nilai_akademik * (periode?.w1_nilai_akademik || 0) +
+        normalized.kehadiran * (periode?.w2_kehadiran || 0) +
+        normalized.prestasi_akademik * (periode?.w3_prestasi_akademik || 0) +
+        normalized.prestasi_nonakademik *
+          (periode?.w4_prestasi_nonakademik || 0) +
+        normalized.perilaku * (periode?.w5_perilaku || 0) +
+        normalized.keaktifan_organisasi *
+          (periode?.w6_keaktifan_organisasi || 0);
 
       return {
         ...m,
-        final_score,
+        final_score: final_score || 0,
       };
     });
 
     // Sort by final score and add rank
     const sortedResults = results
-      .sort(
-        (a: { final_score: number }, b: { final_score: number }) =>
-          b.final_score - a.final_score
-      )
-      .map((result: { final_score: number }, index: number) => ({
+      .sort((a, b) => (b.final_score || 0) - (a.final_score || 0))
+      .map((result, index) => ({
         ...result,
         rank: index + 1,
       }));

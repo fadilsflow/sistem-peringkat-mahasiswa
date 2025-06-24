@@ -18,30 +18,59 @@ import { createPeriode, updatePeriode } from "@/lib/actions/periode";
 import { Periode } from "@prisma/client";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useAuth } from "@clerk/nextjs";
+
+// Helper function to format number to 2 decimal places
+const formatNumber = (num: number) => Number(num.toFixed(2));
 
 const periodeFormSchema = z
   .object({
     id_periode: z.string().min(1, "ID Periode harus diisi"),
     tahun: z.string().min(1, "Tahun harus diisi"),
     semester: z.coerce.number().min(1).max(2),
-    w1_nilai_akademik: z.coerce.number().min(0).max(1),
-    w2_kehadiran: z.coerce.number().min(0).max(1),
-    w3_prestasi_akademik: z.coerce.number().min(0).max(1),
-    w4_prestasi_nonakademik: z.coerce.number().min(0).max(1),
-    w5_perilaku: z.coerce.number().min(0).max(1),
-    w6_keaktifan_organisasi: z.coerce.number().min(0).max(1),
+    w1_nilai_akademik: z.coerce
+      .number()
+      .min(0, "Minimal 0")
+      .max(1, "Maksimal 1")
+      .transform(formatNumber),
+    w2_kehadiran: z.coerce
+      .number()
+      .min(0, "Minimal 0")
+      .max(1, "Maksimal 1")
+      .transform(formatNumber),
+    w3_prestasi_akademik: z.coerce
+      .number()
+      .min(0, "Minimal 0")
+      .max(1, "Maksimal 1")
+      .transform(formatNumber),
+    w4_prestasi_nonakademik: z.coerce
+      .number()
+      .min(0, "Minimal 0")
+      .max(1, "Maksimal 1")
+      .transform(formatNumber),
+    w5_perilaku: z.coerce
+      .number()
+      .min(0, "Minimal 0")
+      .max(1, "Maksimal 1")
+      .transform(formatNumber),
+    w6_keaktifan_organisasi: z.coerce
+      .number()
+      .min(0, "Minimal 0")
+      .max(1, "Maksimal 1")
+      .transform(formatNumber),
     deskripsi: z.string(),
   })
   .refine(
     (data) => {
-      const sum =
+      const sum = formatNumber(
         data.w1_nilai_akademik +
-        data.w2_kehadiran +
-        data.w3_prestasi_akademik +
-        data.w4_prestasi_nonakademik +
-        data.w5_perilaku +
-        data.w6_keaktifan_organisasi;
-      return Math.abs(sum - 1) < 0.0001;
+          data.w2_kehadiran +
+          data.w3_prestasi_akademik +
+          data.w4_prestasi_nonakademik +
+          data.w5_perilaku +
+          data.w6_keaktifan_organisasi
+      );
+      return sum === 1;
     },
     {
       message: "Total bobot harus sama dengan 1",
@@ -58,39 +87,54 @@ interface PeriodeFormProps {
 
 export function PeriodeForm({ initialData, onSuccess }: PeriodeFormProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const { userId } = useAuth();
 
   const form = useForm<PeriodeFormValues>({
     resolver: zodResolver(periodeFormSchema),
-    defaultValues: initialData || {
-      id_periode: "",
-      tahun: new Date().getFullYear().toString(),
-      semester: 1,
-      w1_nilai_akademik: 0.3,
-      w2_kehadiran: 0.2,
-      w3_prestasi_akademik: 0.15,
-      w4_prestasi_nonakademik: 0.15,
-      w5_perilaku: 0.1,
-      w6_keaktifan_organisasi: 0.1,
-      deskripsi: "",
+    defaultValues: {
+      id_periode: initialData?.id_periode || "",
+      tahun:
+        initialData?.tahun.toString() || new Date().getFullYear().toString(),
+      semester: initialData?.semester || 1,
+      w1_nilai_akademik: initialData?.w1_nilai_akademik || 0.3,
+      w2_kehadiran: initialData?.w2_kehadiran || 0.2,
+      w3_prestasi_akademik: initialData?.w3_prestasi_akademik || 0.15,
+      w4_prestasi_nonakademik: initialData?.w4_prestasi_nonakademik || 0.15,
+      w5_perilaku: initialData?.w5_perilaku || 0.1,
+      w6_keaktifan_organisasi: initialData?.w6_keaktifan_organisasi || 0.1,
+      deskripsi: initialData?.deskripsi || "",
     },
   });
 
   async function onSubmit(data: PeriodeFormValues) {
+    if (!userId) {
+      toast.error("Anda harus login terlebih dahulu");
+      return;
+    }
+
     try {
       setIsLoading(true);
+      const periodeData = {
+        ...data,
+        userId, // Add userId to the periode data
+      };
+
       if (initialData) {
-        await updatePeriode(initialData.id_periode, data);
+        await updatePeriode(initialData.id_periode, periodeData);
+        toast.success("Periode berhasil diupdate");
       } else {
-        await createPeriode(data);
+        await createPeriode(periodeData);
+        toast.success("Periode berhasil dibuat");
+        form.reset();
       }
-      toast.success(
-        initialData ? "Periode berhasil diupdate" : "Periode berhasil dibuat"
-      );
       onSuccess?.();
-      if (!initialData) form.reset();
-    } catch (error) {
-      toast.error("Terjadi kesalahan");
-      console.error(error);
+    } catch (error: any) {
+      console.error("Error:", error);
+      if (error.message?.includes("Unique constraint")) {
+        toast.error("Periode dengan ID tersebut sudah ada untuk user ini");
+      } else {
+        toast.error("Terjadi kesalahan");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -158,7 +202,7 @@ export function PeriodeForm({ initialData, onSuccess }: PeriodeFormProps) {
         <div className="space-y-2">
           <h3 className="text-lg font-medium">Bobot Kriteria</h3>
           <p className="text-sm text-muted-foreground">
-            Total bobot harus sama dengan 1
+            Total bobot harus sama dengan 1 (100%)
           </p>
         </div>
 
@@ -173,10 +217,19 @@ export function PeriodeForm({ initialData, onSuccess }: PeriodeFormProps) {
                   <Input
                     type="number"
                     step="0.01"
+                    min="0"
+                    max="1"
                     placeholder="0.3"
                     {...field}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      field.onChange(value === "" ? 0 : parseFloat(value));
+                    }}
                   />
                 </FormControl>
+                <FormDescription>
+                  {(field.value * 100).toFixed(0)}%
+                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -192,10 +245,19 @@ export function PeriodeForm({ initialData, onSuccess }: PeriodeFormProps) {
                   <Input
                     type="number"
                     step="0.01"
+                    min="0"
+                    max="1"
                     placeholder="0.2"
                     {...field}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      field.onChange(value === "" ? 0 : parseFloat(value));
+                    }}
                   />
                 </FormControl>
+                <FormDescription>
+                  {(field.value * 100).toFixed(0)}%
+                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -211,10 +273,19 @@ export function PeriodeForm({ initialData, onSuccess }: PeriodeFormProps) {
                   <Input
                     type="number"
                     step="0.01"
+                    min="0"
+                    max="1"
                     placeholder="0.15"
                     {...field}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      field.onChange(value === "" ? 0 : parseFloat(value));
+                    }}
                   />
                 </FormControl>
+                <FormDescription>
+                  {(field.value * 100).toFixed(0)}%
+                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -230,10 +301,19 @@ export function PeriodeForm({ initialData, onSuccess }: PeriodeFormProps) {
                   <Input
                     type="number"
                     step="0.01"
+                    min="0"
+                    max="1"
                     placeholder="0.15"
                     {...field}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      field.onChange(value === "" ? 0 : parseFloat(value));
+                    }}
                   />
                 </FormControl>
+                <FormDescription>
+                  {(field.value * 100).toFixed(0)}%
+                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -249,10 +329,19 @@ export function PeriodeForm({ initialData, onSuccess }: PeriodeFormProps) {
                   <Input
                     type="number"
                     step="0.01"
+                    min="0"
+                    max="1"
                     placeholder="0.1"
                     {...field}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      field.onChange(value === "" ? 0 : parseFloat(value));
+                    }}
                   />
                 </FormControl>
+                <FormDescription>
+                  {(field.value * 100).toFixed(0)}%
+                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -268,10 +357,19 @@ export function PeriodeForm({ initialData, onSuccess }: PeriodeFormProps) {
                   <Input
                     type="number"
                     step="0.01"
+                    min="0"
+                    max="1"
                     placeholder="0.1"
                     {...field}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      field.onChange(value === "" ? 0 : parseFloat(value));
+                    }}
                   />
                 </FormControl>
+                <FormDescription>
+                  {(field.value * 100).toFixed(0)}%
+                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}

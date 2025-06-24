@@ -11,20 +11,7 @@ interface ExcelExportProps {
 
 export default function ExcelExport({ data }: ExcelExportProps) {
   const handleExport = () => {
-    const formattedData = data.map((item) => ({
-      nim: item.nim,
-      nama: item.nama,
-      nilai_akademik: item.nilai_akademik,
-      kehadiran: item.kehadiran,
-      prestasi_akademik: item.prestasi_akademik,
-      prestasi_nonakademik: item.prestasi_nonakademik,
-      perilaku: item.perilaku,
-      keaktifan_organisasi: item.keaktifan_organisasi,
-      periodeId_periode: item.periodeId_periode,
-      tanggal_input: item.tanggal_input,
-    }));
-
-    exportToExcel(formattedData, "data-mahasiswa.xlsx");
+    exportToExcel(data, "data-mahasiswa.xlsx");
   };
 
   return (

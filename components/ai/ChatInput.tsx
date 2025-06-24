@@ -1,7 +1,10 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { SendHorizontal } from "lucide-react";
 import { useRef, useState } from "react";
+import { ChatTemplates } from "./ChatTemplates";
 
 interface ChatInputProps {
   onSend: (message: string) => void;
@@ -34,25 +37,44 @@ export function ChatInput({ onSend, isLoading }: ChatInputProps) {
     const textarea = e.target;
     setMessage(textarea.value);
 
-    // Auto-resize textarea
+    // Auto-expand textarea
     textarea.style.height = "auto";
-    textarea.style.height = `${textarea.scrollHeight}px`;
+    textarea.style.height = Math.min(textarea.scrollHeight, 200) + "px";
+  };
+
+  const handleSelectTemplate = (prompt: string) => {
+    setMessage(prompt);
+    if (textareaRef.current) {
+      textareaRef.current.focus();
+      textareaRef.current.style.height = "auto";
+      textareaRef.current.style.height =
+        Math.min(textareaRef.current.scrollHeight, 200) + "px";
+    }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex gap-2">
-      <Textarea
-        ref={textareaRef}
-        value={message}
-        onChange={handleInput}
-        onKeyDown={handleKeyDown}
-        placeholder="Ask about student performance..."
-        className="min-h-[50px] max-h-[200px] resize-none"
-        disabled={isLoading}
-      />
-      <Button type="submit" size="icon" disabled={!message.trim() || isLoading}>
-        <SendHorizontal className="h-4 w-4" />
-      </Button>
-    </form>
+    <div className="relative">
+      <ChatTemplates onSelectTemplate={handleSelectTemplate} />
+      <form onSubmit={handleSubmit} className="relative flex items-end gap-2">
+        <Textarea
+          ref={textareaRef}
+          value={message}
+          onChange={handleInput}
+          onKeyDown={handleKeyDown}
+          placeholder="Tanyakan tentang data mahasiswa... (Enter untuk kirim, Shift+Enter untuk baris baru)"
+          className="min-h-[52px] max-h-[200px] resize-none py-3 pr-12 text-base"
+          disabled={isLoading}
+        />
+        <Button
+          type="submit"
+          size="icon"
+          disabled={!message.trim() || isLoading}
+          className="absolute bottom-1.5 right-1.5"
+        >
+          <SendHorizontal className="h-5 w-5" />
+          <span className="sr-only">Kirim pesan</span>
+        </Button>
+      </form>
+    </div>
   );
 }

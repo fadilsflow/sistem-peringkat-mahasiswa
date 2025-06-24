@@ -23,15 +23,16 @@ model Mahasiswa {
   perilaku             Int
   keaktifan_organisasi Int
   tanggal_input        DateTime
-  periode              Periode  @relation(fields: [periodeId_periode], references: [id_periode])
+  periode              Periode  @relation(fields: [periodeId_periode, userId], references: [id_periode, userId])
   periodeId_periode    String
+  userId               String
 
-  @@id([nim, periodeId_periode])
-  @@index([periodeId_periode])
+  @@id([nim, periodeId_periode, userId])
+  @@index([periodeId_periode, userId])
 }
 
 model Periode {
-  id_periode              String      @id
+  id_periode              String
   tahun                   String
   semester                Int
   w1_nilai_akademik       Float
@@ -43,6 +44,8 @@ model Periode {
   deskripsi               String
   mahasiswa               Mahasiswa[]
   userId                  String
+
+  @@id([id_periode, userId])
 }
 
 model AIChatSession {

@@ -1,11 +1,19 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@clerk/nextjs";
-import { Card } from "@/components/ui/card";
-import { ChatBubble } from "@/components/ai/ChatBubble";
-import { ChatInput } from "@/components/ai/ChatInput";
+import { ChatContainer } from "@/components/ai/ChatContainer";
 import { DownloadPDFButton } from "@/components/ai/DownloadPDFButton";
+import { SessionDialog } from "@/components/ai/SessionDialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 interface Message {
   id: string;
@@ -18,6 +26,13 @@ interface Session {
   id: string;
   title: string;
   messages: Message[];
+  createdAt: Date;
+}
+
+interface Period {
+  id_periode: string;
+  tahun: number;
+  semester: number;
 }
 
 export default function AIReportPage() {
@@ -25,61 +40,121 @@ export default function AIReportPage() {
   const [sessions, setSessions] = useState<Session[]>([]);
   const [currentSession, setCurrentSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const chatEndRef = useRef<HTMLDivElement>(null);
+  const [periods, setPeriods] = useState<Period[]>([]);
+  const [selectedPeriod, setSelectedPeriod] = useState<string>("");
+  const [isPeriodLoading, setIsPeriodLoading] = useState(true);
+  const [isPeriodError, setIsPeriodError] = useState(false);
 
+  // Fetch sessions and periods on mount
   useEffect(() => {
-    if (userId) {
-      fetchSessions();
+    async function fetchData() {
+      if (!userId) return;
+
+      setIsPeriodLoading(true);
+      setIsPeriodError(false);
+      try {
+        // Fetch periods
+        const periodsResponse = await fetch("/api/periode");
+        if (!periodsResponse.ok) throw new Error("Failed to fetch periods");
+        const periodsData = await periodsResponse.json();
+        setPeriods(periodsData);
+        if (periodsData.length > 0) {
+          setSelectedPeriod(periodsData[0].id_periode);
+        }
+
+        // Fetch sessions
+        const sessionsResponse = await fetch("/api/ai-report");
+        if (!sessionsResponse.ok) throw new Error("Failed to fetch sessions");
+        const sessionsData = await sessionsResponse.json();
+        setSessions(sessionsData.sessions);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setIsPeriodError(true);
+      } finally {
+        setIsPeriodLoading(false);
+      }
     }
+    fetchData();
   }, [userId]);
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [currentSession?.messages]);
+  // Handle loading state
+  if (isPeriodLoading) {
+    return (
+      <div className="flex h-[calc(100vh-4rem)] items-center justify-center">
+        <p className="text-lg text-muted-foreground">Memuat data...</p>
+      </div>
+    );
+  }
 
-  const fetchSessions = async () => {
-    try {
-      const response = await fetch("/api/ai-report");
-      const data = await response.json();
-      setSessions(data.sessions);
-    } catch (error) {
-      console.error("Error fetching sessions:", error);
-    }
-  };
+  // Handle error state
+  if (isPeriodError) {
+    return (
+      <div className="flex h-[calc(100vh-4rem)] flex-col items-center justify-center gap-4">
+        <h1 className="text-3xl font-bold tracking-tight text-destructive sm:text-4xl">
+          Terjadi Kesalahan
+        </h1>
+        <p className="text-lg text-muted-foreground">
+          Gagal memuat data periode. Silakan coba lagi nanti.
+        </p>
+        <Button onClick={() => window.location.reload()}>Muat Ulang</Button>
+      </div>
+    );
+  }
 
-  const scrollToBottom = () => {
-    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
+  // Handle no periods state
+  if (periods.length === 0) {
+    return (
+      <div className="flex h-[calc(100vh-4rem)] flex-col items-center justify-center gap-4">
+        <h1 className="text-3xl font-bold tracking-tight text-primary sm:text-5xl">
+          Selamat Datang di SyncRank!
+        </h1>
+        <p className="text-center text-lg text-muted-foreground">
+          Anda belum memiliki periode yang aktif. Silakan tambahkan periode
+          untuk memulai.
+        </p>
+        <Button asChild>
+          <Link href="/manage">Tambah Periode</Link>
+        </Button>
+      </div>
+    );
+  }
 
   const handleSendMessage = async (message: string) => {
+    if (!userId || isLoading || !selectedPeriod) return;
+
+    setIsLoading(true);
     try {
-      setIsLoading(true);
       const response = await fetch("/api/ai-report", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           message,
           sessionId: currentSession?.id,
+          periodeId: selectedPeriod,
         }),
       });
 
-      const data = await response.json();
+      if (!response.ok) throw new Error("Failed to send message");
 
+      const data = await response.json();
       if (!currentSession) {
-        // New session created
-        await fetchSessions();
         const newSession = {
           id: data.sessionId,
           title: message.slice(0, 50) + "...",
           messages: data.messages,
+          createdAt: new Date(),
         };
         setCurrentSession(newSession);
+        setSessions([newSession, ...sessions]);
       } else {
-        // Update existing session
-        setCurrentSession({
+        const updatedSession = {
           ...currentSession,
           messages: [...currentSession.messages, ...data.messages],
-        });
+        };
+        setCurrentSession(updatedSession);
+        setSessions(
+          sessions.map((s) => (s.id === updatedSession.id ? updatedSession : s))
+        );
       }
     } catch (error) {
       console.error("Error sending message:", error);
@@ -88,60 +163,56 @@ export default function AIReportPage() {
     }
   };
 
+  const handleSelectSession = (sessionId: string) => {
+    const session = sessions.find((s) => s.id === sessionId);
+    if (session) {
+      setCurrentSession(session);
+    }
+  };
+
+  const handleNewSession = () => {
+    setCurrentSession(null);
+  };
+
   return (
-    <div className="container mx-auto py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight">
-          AI Report Assistant
-        </h1>
-        <p className="text-muted-foreground mt-2">
-          Ask questions about student performance and get AI-powered insights
-        </p>
+    <div className="fixed inset-0 flex flex-col overflow-hidden bg-background pt-16">
+      {/* Header */}
+      <div className="flex items-center justify-end border-b p-4">
+        <div className="flex items-center gap-4">
+          <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
+            <SelectTrigger className="w-[350px] max-w-full">
+              <SelectValue placeholder="Pilih Periode" />
+            </SelectTrigger>
+            <SelectContent>
+              {periods.map((period) => (
+                <SelectItem key={period.id_periode} value={period.id_periode}>
+                  {`Periode ${period.id_periode} - Tahun ${period.tahun}`}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <SessionDialog
+            sessions={sessions}
+            currentSessionId={currentSession?.id}
+            onSelectSession={handleSelectSession}
+            onNewSession={handleNewSession}
+          />
+          {currentSession && (
+            <DownloadPDFButton
+              messages={currentSession.messages}
+              sessionTitle={currentSession.title}
+            />
+          )}
+        </div>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-[300px_1fr]">
-        {/* Sessions List */}
-        <Card className="p-4 h-[600px] overflow-y-auto">
-          <div className="font-medium mb-4">Chat History</div>
-          <div className="space-y-2">
-            {sessions.map((session) => (
-              <button
-                key={session.id}
-                onClick={() => setCurrentSession(session)}
-                className={`w-full text-left p-2 rounded hover:bg-accent truncate ${
-                  currentSession?.id === session.id ? "bg-accent" : ""
-                }`}
-              >
-                {session.title}
-              </button>
-            ))}
-          </div>
-        </Card>
-
-        {/* Chat Area */}
-        <Card className="flex flex-col h-[600px]">
-          <div className="flex-1 overflow-y-auto p-4">
-            {currentSession?.messages.map((message) => (
-              <ChatBubble key={message.id} {...message} />
-            ))}
-            <div ref={chatEndRef} />
-          </div>
-
-          <div className="border-t p-4">
-            <div className="flex justify-between items-center mb-4">
-              <div className="text-sm text-muted-foreground">
-                {isLoading ? "AI is thinking..." : "Ask a question"}
-              </div>
-              {currentSession && (
-                <DownloadPDFButton
-                  messages={currentSession.messages}
-                  sessionTitle={currentSession.title}
-                />
-              )}
-            </div>
-            <ChatInput onSend={handleSendMessage} isLoading={isLoading} />
-          </div>
-        </Card>
+      {/* Chat Area */}
+      <div className="flex-1 overflow-hidden">
+        <ChatContainer
+          messages={currentSession?.messages || []}
+          isLoading={isLoading}
+          onSendMessage={handleSendMessage}
+        />
       </div>
     </div>
   );

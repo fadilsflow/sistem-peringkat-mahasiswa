@@ -27,7 +27,18 @@ export async function getMahasiswaList(periodeId?: string) {
   }
 
   return await prisma.mahasiswa.findMany({
-    where: periodeId ? { periodeId_periode: periodeId } : undefined,
+    where: periodeId
+      ? {
+          periodeId_periode: periodeId,
+          periode: {
+            userId: userId,
+          },
+        }
+      : {
+          periode: {
+            userId: userId,
+          },
+        },
     include: { periode: true },
     orderBy: { nim: "asc" },
   });
@@ -44,6 +55,9 @@ export async function getMahasiswaById(nim: string, periodeId: string) {
     where: {
       nim,
       periodeId_periode: periodeId,
+      periode: {
+        userId: userId,
+      },
     },
     include: { periode: true },
   });
@@ -98,18 +112,19 @@ export async function createMahasiswa(data: CreateMahasiswaData) {
     }
 
     // Create new mahasiswa
+    const { periodeId_periode, ...mahasiswaData } = data;
     await prisma.mahasiswa.create({
       data: {
-        nim: data.nim,
-        nama: data.nama,
-        nilai_akademik: data.nilai_akademik,
-        kehadiran: data.kehadiran,
-        prestasi_akademik: data.prestasi_akademik,
-        prestasi_nonakademik: data.prestasi_nonakademik,
-        perilaku: data.perilaku,
-        keaktifan_organisasi: data.keaktifan_organisasi,
+        ...mahasiswaData,
         tanggal_input: new Date(),
-        periodeId_periode: data.periodeId_periode,
+        periode: {
+          connect: {
+            id_periode_userId: {
+              id_periode: periodeId_periode,
+              userId: userId,
+            },
+          },
+        },
       },
     });
 
@@ -157,13 +172,17 @@ export async function updateMahasiswa(
     throw new Error("Periode not found or access denied");
   }
 
+  const { periodeId_periode, ...updateData } = data;
   await prisma.mahasiswa.updateMany({
     where: {
       nim,
       periodeId_periode: periodeId,
+      periode: {
+        userId: userId,
+      },
     },
     data: {
-      ...data,
+      ...updateData,
       tanggal_input: new Date(),
     },
   });
@@ -184,6 +203,9 @@ export async function deleteMahasiswa(nim: string, periodeId: string) {
       where: {
         nim,
         periodeId_periode: periodeId,
+        periode: {
+          userId: userId,
+        },
       },
     });
 
@@ -225,7 +247,15 @@ export async function createMahasiswaBulk(data: CreateMahasiswaData[]) {
     const nims = data.map((item) => item.nim);
     const existingMahasiswa = await prisma.mahasiswa.findMany({
       where: {
-        AND: [{ nim: { in: nims } }, { periodeId_periode: periodeId }],
+        AND: [
+          { nim: { in: nims } },
+          { periodeId_periode: periodeId },
+          {
+            periode: {
+              userId: userId,
+            },
+          },
+        ],
       },
       select: {
         nim: true,
@@ -234,18 +264,31 @@ export async function createMahasiswaBulk(data: CreateMahasiswaData[]) {
 
     if (existingMahasiswa.length > 0) {
       throw new Error(
-        `Beberapa NIM sudah terdaftar di periode ini: ${existingMahasiswa.map((m) => m.nim).join(", ")}`
+        `Beberapa NIM sudah terdaftar di periode ini: ${existingMahasiswa
+          .map((m) => m.nim)
+          .join(", ")}`
       );
     }
 
     // Create all mahasiswa records in a single transaction
     await prisma.$transaction(async (tx) => {
-      await tx.mahasiswa.createMany({
-        data: data.map((item) => ({
-          ...item,
-          tanggal_input: new Date(),
-        })),
-      });
+      for (const item of data) {
+        const { periodeId_periode, ...mahasiswaData } = item;
+        await tx.mahasiswa.create({
+          data: {
+            ...mahasiswaData,
+            tanggal_input: new Date(),
+            periode: {
+              connect: {
+                id_periode_userId: {
+                  id_periode: periodeId,
+                  userId: userId,
+                },
+              },
+            },
+          },
+        });
+      }
     });
 
     revalidatePath("/mahasiswa");

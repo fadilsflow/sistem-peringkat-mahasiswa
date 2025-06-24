@@ -72,7 +72,7 @@ export function PeriodeContent() {
   const columns: ColumnDef<Periode>[] = [
     {
       accessorKey: "id_periode",
-      header: "ID Periodex",
+      header: "ID Periode",
     },
     {
       accessorKey: "tahun",
@@ -85,32 +85,58 @@ export function PeriodeContent() {
     {
       accessorKey: "w1_nilai_akademik",
       header: "Bobot Nilai Akademik",
-      cell: ({ row }) => row.original.w1_nilai_akademik.toFixed(2),
+      cell: ({ row }) => {
+        const value = row.original.w1_nilai_akademik;
+        return <span>{(value * 100).toFixed(0)}%</span>;
+      },
     },
     {
       accessorKey: "w2_kehadiran",
       header: "Bobot Kehadiran",
-      cell: ({ row }) => row.original.w2_kehadiran.toFixed(2),
+      cell: ({ row }) => {
+        const value = row.original.w2_kehadiran;
+        return <span>{(value * 100).toFixed(0)}%</span>;
+      },
     },
     {
       accessorKey: "w3_prestasi_akademik",
       header: "Bobot Prestasi Akademik",
-      cell: ({ row }) => row.original.w3_prestasi_akademik.toFixed(2),
+      cell: ({ row }) => {
+        const value = row.original.w3_prestasi_akademik;
+        return <span>{(value * 100).toFixed(0)}%</span>;
+      },
     },
     {
       accessorKey: "w4_prestasi_nonakademik",
       header: "Bobot Prestasi Non-akademik",
-      cell: ({ row }) => row.original.w4_prestasi_nonakademik.toFixed(2),
+      cell: ({ row }) => {
+        const value = row.original.w4_prestasi_nonakademik;
+        return <span>{(value * 100).toFixed(0)}%</span>;
+      },
     },
     {
       accessorKey: "w5_perilaku",
       header: "Bobot Perilaku",
-      cell: ({ row }) => row.original.w5_perilaku.toFixed(2),
+      cell: ({ row }) => {
+        const value = row.original.w5_perilaku;
+        return <span>{(value * 100).toFixed(0)}%</span>;
+      },
     },
     {
       accessorKey: "w6_keaktifan_organisasi",
       header: "Bobot Keaktifan Organisasi",
-      cell: ({ row }) => row.original.w6_keaktifan_organisasi.toFixed(2),
+      cell: ({ row }) => {
+        const value = row.original.w6_keaktifan_organisasi;
+        return <span>{(value * 100).toFixed(0)}%</span>;
+      },
+    },
+    {
+      accessorKey: "deskripsi",
+      header: "Deskripsi",
+      cell: ({ row }) => {
+        const value = row.original.deskripsi;
+        return <span>{value || "-"}</span>;
+      },
     },
     {
       id: "actions",
@@ -216,28 +242,19 @@ export function PeriodeContent() {
         </Card>
       )}
 
-      {/* Delete Confirmation Dialog */}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Konfirmasi Hapus</DialogTitle>
+            <DialogTitle>Hapus Periode</DialogTitle>
             <DialogDescription>
-              Apakah Anda yakin ingin menghapus periode ini?
-              {periodeToDelete && (
-                <p className="mt-2 font-medium">
-                  {periodeToDelete.tahun} - Semester {periodeToDelete.semester}
-                </p>
-              )}
+              Apakah Anda yakin ingin menghapus periode ini? Semua data
+              mahasiswa pada periode ini akan ikut terhapus.
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter className="flex items-center gap-2">
+          <DialogFooter>
             <Button
               variant="outline"
-              onClick={() => {
-                setIsDeleteDialogOpen(false);
-                setPeriodeToDelete(null);
-              }}
-              disabled={isDeleting}
+              onClick={() => setIsDeleteDialogOpen(false)}
             >
               Batal
             </Button>
@@ -246,8 +263,14 @@ export function PeriodeContent() {
               onClick={() => periodeToDelete && handleDelete(periodeToDelete)}
               disabled={isDeleting}
             >
-              {isDeleting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {isDeleting ? "Menghapus..." : "Hapus"}
+              {isDeleting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Menghapus...
+                </>
+              ) : (
+                "Hapus"
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>

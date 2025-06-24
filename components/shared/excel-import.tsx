@@ -82,9 +82,17 @@ export default function ExcelImport({
       event.target.value = "";
     } catch (error) {
       console.error("Error importing data:", error);
-      toast.error(
-        error instanceof Error ? error.message : "Gagal mengimpor data"
-      );
+      if (error instanceof Error) {
+        if (error.message.includes("already exists")) {
+          toast.error("Beberapa NIM sudah terdaftar di periode ini");
+        } else if (error.message.includes("not found")) {
+          toast.error("Periode tidak ditemukan atau akses ditolak");
+        } else {
+          toast.error(error.message);
+        }
+      } else {
+        toast.error("Gagal mengimpor data");
+      }
     } finally {
       setIsLoading(false);
     }

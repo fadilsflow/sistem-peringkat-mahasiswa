@@ -10,7 +10,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { message, sessionId } = await req.json();
+    const { message, sessionId, periodeId } = await req.json();
 
     // Get or create chat session
     let session;
@@ -45,20 +45,26 @@ export async function POST(req: Request) {
       },
     });
 
-    // Get AI response
+    // Get AI response with SAW data from specified period
     const aiResponse = await getGeminiResponse(
       session.messages.concat(userMessage).map((msg) => ({
-        role: msg.role as "user" | "assistant",
+        role: msg.role as "user" | "assistant" | "system",
         content: msg.content,
-      }))
+      })),
+      periodeId,
+      userId
     );
+
+    if (!aiResponse) {
+      throw new Error("Failed to get AI response");
+    }
 
     // Save AI response
     const assistantMessage = await prisma.aIChatMessage.create({
       data: {
         sessionId: session.id,
         role: "assistant",
-        content: aiResponse || "Terjadi kesalahan saat memproses pesan",
+        content: aiResponse,
       },
     });
 
@@ -68,6 +74,9 @@ export async function POST(req: Request) {
     });
   } catch (error) {
     console.error("Error in AI chat:", error);
+    if (error instanceof Error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
     return NextResponse.json(
       { error: "Failed to process request" },
       { status: 500 }

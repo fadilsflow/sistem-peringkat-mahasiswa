@@ -8,27 +8,25 @@ interface DashboardStats {
   avgPrestasi: number;
 }
 
+async function fetchMahasiswaByPeriode(
+  periodeId: string | null
+): Promise<Mahasiswa[]> {
+  if (!periodeId) return [];
+
+  const response = await fetch(`/api/mahasiswa?periodeId=${periodeId}`);
+  if (!response.ok) {
+    throw new Error("Failed to fetch mahasiswa");
+  }
+  return response.json();
+}
+
 async function fetchPeriodes(): Promise<Periode[]> {
   const response = await fetch("/api/periode");
   if (!response.ok) {
     throw new Error("Failed to fetch periodes");
   }
-  return response.json();
-}
-
-async function fetchMahasiswaByPeriode(
-  periodeId: string
-): Promise<Mahasiswa[]> {
-  const response = await fetch(
-    `/api/mahasiswa?periode=${encodeURIComponent(periodeId)}`
-  );
-  if (!response.ok) {
-    if (response.status === 404) {
-      return []; // Return empty array for non-existent periods
-    }
-    throw new Error("Failed to fetch mahasiswa");
-  }
-  return response.json();
+  const data = await response.json();
+  return data;
 }
 
 async function fetchDashboardStats(periodeId: string): Promise<DashboardStats> {
@@ -41,6 +39,14 @@ async function fetchDashboardStats(periodeId: string): Promise<DashboardStats> {
   return response.json();
 }
 
+export function useMahasiswaByPeriode(periodeId: string | null) {
+  return useQuery({
+    queryKey: ["mahasiswa", periodeId],
+    queryFn: () => fetchMahasiswaByPeriode(periodeId),
+    enabled: !!periodeId,
+  });
+}
+
 export function usePeriodes() {
   return useQuery({
     queryKey: ["periodes"],
@@ -48,18 +54,25 @@ export function usePeriodes() {
   });
 }
 
-export function useMahasiswaByPeriode(periodeId: string | null) {
-  return useQuery({
-    queryKey: ["mahasiswa", periodeId],
-    queryFn: () => fetchMahasiswaByPeriode(periodeId!),
-    enabled: !!periodeId,
-  });
-}
-
 export function useDashboardStats(periodeId: string | null) {
   return useQuery({
     queryKey: ["dashboard", periodeId],
     queryFn: () => fetchDashboardStats(periodeId!),
+    enabled: !!periodeId,
+  });
+}
+
+export function useActivePeriode(periodeId: string | null) {
+  return useQuery({
+    queryKey: ["periode", periodeId],
+    queryFn: async () => {
+      if (!periodeId) return null;
+      const response = await fetch(`/api/periode/${periodeId}`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch periode");
+      }
+      return response.json();
+    },
     enabled: !!periodeId,
   });
 }

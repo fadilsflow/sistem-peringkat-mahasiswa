@@ -12,6 +12,7 @@ export function Header() {
   const navItemsSignedIn = [
     { href: "/dashboard", label: "Dashboard" },
     { href: "/manage", label: "Manage Data" },
+    { href: "/ai-report", label: "AI Report" },
   ];
   const isHome = pathname === "/" || pathname === "/about";
   return (
@@ -44,7 +45,7 @@ export function Header() {
 
             <SignedIn>
               {isHome ? (
-                <Button size="sm" className="text-sm" asChild>
+                <Button size="sm" className="text-sm" asChild>  
                   <Link href="/dashboard">Dashboard</Link>
                 </Button>
               ) : (

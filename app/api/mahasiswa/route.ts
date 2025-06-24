@@ -11,7 +11,7 @@ export async function GET(request: Request) {
     }
 
     const { searchParams } = new URL(request.url);
-    const periodeId = searchParams.get("periode");
+    const periodeId = searchParams.get("periodeId");
 
     if (!periodeId) {
       return NextResponse.json(
@@ -38,6 +38,12 @@ export async function GET(request: Request) {
     const mahasiswa = await prisma.mahasiswa.findMany({
       where: {
         periodeId_periode: periodeId,
+        periode: {
+          userId: userId,
+        },
+      },
+      include: {
+        periode: true,
       },
       orderBy: {
         nim: "asc",
