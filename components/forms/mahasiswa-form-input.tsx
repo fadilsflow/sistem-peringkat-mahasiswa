@@ -51,7 +51,7 @@ export function MahasiswaFormInput({
         prestasi_nonakademik: parseInt(formData.prestasi_nonakademik),
         perilaku: parseInt(formData.perilaku),
         keaktifan_organisasi: parseInt(formData.keaktifan_organisasi),
-        periodeId_periode: periodeId,
+        periodeId: periodeId,
       });
 
       setFormData({

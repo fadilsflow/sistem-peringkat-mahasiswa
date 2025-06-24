@@ -13,6 +13,7 @@ import {
 import { toast } from "sonner";
 import * as XLSX from "xlsx";
 import { Loader2 } from "lucide-react";
+import { useAuth } from "@clerk/nextjs";
 
 interface ExcelImportProps {
   periodeId: string;
@@ -24,7 +25,7 @@ export default function ExcelImport({
   onSuccess,
 }: ExcelImportProps) {
   const [isLoading, setIsLoading] = useState(false);
-
+  const { userId } = useAuth();
   const handleDownloadTemplate = () => {
     try {
       const workbook = generateExcelTemplate();
@@ -69,7 +70,8 @@ export default function ExcelImport({
       // Prepare data for bulk import
       const bulkData = data.map((student) => ({
         ...student,
-        periodeId_periode: periodeId,
+        periodeId: periodeId,
+        userId: userId,
       }));
 
       // Save data in bulk

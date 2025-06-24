@@ -31,8 +31,9 @@ interface Session {
 }
 
 interface Period {
-  id_periode: string;
-  tahun: number;
+  id: string;
+  kode_periode: string;
+  tahun: string;
   semester: number;
   _count?: {
     mahasiswa: number;
@@ -64,7 +65,7 @@ export default function AIReportPage() {
         const periodsData = await periodsResponse.json();
         setPeriods(periodsData);
         if (periodsData.length > 0) {
-          setSelectedPeriod(periodsData[0].id_periode);
+          setSelectedPeriod(periodsData[0].id);
         }
 
         // Fetch sessions
@@ -85,10 +86,10 @@ export default function AIReportPage() {
   // Check if selected period has students
   useEffect(() => {
     if (selectedPeriod) {
-      const period = periods.find((p) => p.id_periode === selectedPeriod);
+      const period = periods.find((p) => p.id === selectedPeriod);
       if (period && period._count?.mahasiswa === 0) {
         setNoStudentsError(
-          `Periode ${period.id_periode} belum memiliki data mahasiswa`
+          `Periode ${period.kode_periode} belum memiliki data mahasiswa`
         );
       } else {
         setNoStudentsError(null);
@@ -142,7 +143,7 @@ export default function AIReportPage() {
     if (!userId || isLoading || !selectedPeriod) return;
 
     // Check if selected period has students
-    const period = periods.find((p) => p.id_periode === selectedPeriod);
+    const period = periods.find((p) => p.id === selectedPeriod);
     if (period && period._count?.mahasiswa === 0) {
       toast.error(
         <div className="flex flex-col gap-2">
@@ -243,12 +244,11 @@ export default function AIReportPage() {
             <SelectContent>
               {periods.map((period) => (
                 <SelectItem
-                  key={period.id_periode}
-                  value={period.id_periode}
+                  key={period.id}
+                  value={period.id}
                   disabled={period._count?.mahasiswa === 0}
                 >
-                  {`Periode ${period.id_periode} - Tahun ${period.tahun}`}
-                  {period._count?.mahasiswa === 0 && " (Belum ada data)"}
+                  {`Periode ${period.kode_periode} - Tahun ${period.tahun}`}
                 </SelectItem>
               ))}
             </SelectContent>

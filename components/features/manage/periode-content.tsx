@@ -43,7 +43,7 @@ export function PeriodeContent() {
     try {
       setIsDeleting(true);
       toast.loading("Menghapus periode...");
-      await deletePeriode(periode.id_periode);
+      await deletePeriode(periode.id);
       toast.dismiss();
       toast.success("Periode berhasil dihapus");
       queryClient.invalidateQueries({ queryKey: ["periodes"] });
@@ -52,7 +52,10 @@ export function PeriodeContent() {
     } catch (error) {
       console.error(error);
       toast.dismiss();
-      toast.error("Gagal menghapus periode");
+      toast.error((error as Error)?.message || "Gagal menghapus periode", {
+        description:
+          "Pastikan tidak ada mahasiswa yang terdaftar di periode ini sebelum menghapus.",
+      });
     } finally {
       setIsDeleting(false);
     }
@@ -71,8 +74,8 @@ export function PeriodeContent() {
 
   const columns: ColumnDef<Periode>[] = [
     {
-      accessorKey: "id_periode",
-      header: "ID Periode",
+      accessorKey: "kode_periode",
+      header: "Kode Periode",
     },
     {
       accessorKey: "tahun",
@@ -235,8 +238,8 @@ export function PeriodeContent() {
             <DataTable
               columns={columns}
               data={periodeList}
-              filterColumn="id_periode"
-              filterPlaceholder="Filter ID periode..."
+              filterColumn="kode_periode"
+              filterPlaceholder="Filter kode periode..."
             />
           </CardContent>
         </Card>
@@ -247,8 +250,10 @@ export function PeriodeContent() {
           <DialogHeader>
             <DialogTitle>Hapus Periode</DialogTitle>
             <DialogDescription>
-              Apakah Anda yakin ingin menghapus periode ini? Semua data
-              mahasiswa pada periode ini akan ikut terhapus.
+              Apakah Anda yakin ingin menghapus periode{" "}
+              <strong>{periodeToDelete?.kode_periode}</strong>? Tindakan ini
+              tidak dapat dibatalkan dan akan menghapus semua data mahasiswa
+              terkait.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

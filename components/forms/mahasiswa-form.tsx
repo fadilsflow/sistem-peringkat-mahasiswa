@@ -22,14 +22,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { createMahasiswa, updateMahasiswa } from "@/lib/actions/mahasiswa";
-import { Mahasiswa, Periode } from "@prisma/client";
-import { useState } from "react";
+import { Mahasiswa } from "@prisma/client";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
+import { usePeriodes } from "@/lib/hooks/use-queries";
+import { Loader2 } from "lucide-react";
 
 const mahasiswaFormSchema = z.object({
   nim: z.string().min(1, "NIM harus diisi"),
   nama: z.string().min(1, "Nama harus diisi"),
-  periodeId_periode: z.string().min(1, "Periode harus dipilih"),
+  periodeId: z.string().min(1, "Periode harus dipilih"),
   nilai_akademik: z.coerce.number().min(0).max(100),
   kehadiran: z.coerce.number().min(0).max(100),
   prestasi_akademik: z.coerce.number().min(0).max(5),
@@ -42,41 +44,56 @@ type MahasiswaFormValues = z.infer<typeof mahasiswaFormSchema>;
 
 interface MahasiswaFormProps {
   initialData?: Mahasiswa;
-  periodeList: Periode[];
+  periodeId?: string;
   onSuccess?: () => void;
 }
 
 export function MahasiswaForm({
   initialData,
-  periodeList,
+  periodeId,
   onSuccess,
 }: MahasiswaFormProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const { data: periodeList, isLoading: isPeriodeLoading } = usePeriodes();
 
   const form = useForm<MahasiswaFormValues>({
     resolver: zodResolver(mahasiswaFormSchema),
-    defaultValues: initialData || {
-      nim: "",
-      nama: "",
-      periodeId_periode: "",
-      nilai_akademik: 0,
-      kehadiran: 0,
-      prestasi_akademik: 0,
-      prestasi_nonakademik: 0,
-      perilaku: 1,
-      keaktifan_organisasi: 1,
+    defaultValues: {
+      nim: initialData?.nim || "",
+      nama: initialData?.nama || "",
+      periodeId: initialData?.periodeId || periodeId || "",
+      nilai_akademik: initialData?.nilai_akademik || 0,
+      kehadiran: initialData?.kehadiran || 0,
+      prestasi_akademik: initialData?.prestasi_akademik || 0,
+      prestasi_nonakademik: initialData?.prestasi_nonakademik || 0,
+      perilaku: initialData?.perilaku || 1,
+      keaktifan_organisasi: initialData?.keaktifan_organisasi || 1,
     },
   });
+
+  useEffect(() => {
+    const defaultValues = {
+      nim: initialData?.nim || "",
+      nama: initialData?.nama || "",
+      periodeId: initialData?.periodeId || periodeId || "",
+      nilai_akademik: initialData?.nilai_akademik || 0,
+      kehadiran: initialData?.kehadiran || 0,
+      prestasi_akademik: initialData?.prestasi_akademik || 0,
+      prestasi_nonakademik: initialData?.prestasi_nonakademik || 0,
+      perilaku: initialData?.perilaku || 1,
+      keaktifan_organisasi: initialData?.keaktifan_organisasi || 1,
+    };
+    form.reset(defaultValues);
+  }, [initialData, periodeId, form]);
 
   async function onSubmit(data: MahasiswaFormValues) {
     try {
       setIsLoading(true);
       if (initialData) {
-        await updateMahasiswa(
-          initialData.nim,
-          initialData.periodeId_periode,
-          data
-        );
+        await updateMahasiswa(initialData.nim, initialData.periodeId, {
+          ...data,
+          periodeId: data.periodeId, // ensure periodeId is passed
+        });
       } else {
         await createMahasiswa(data);
       }
@@ -88,12 +105,16 @@ export function MahasiswaForm({
       onSuccess?.();
       if (!initialData) form.reset();
     } catch (error) {
-      toast.error("Terjadi kesalahan");
+      toast.error(
+        (error as Error)?.message || "Terjadi kesalahan saat menyimpan data."
+      );
       console.error(error);
     } finally {
       setIsLoading(false);
     }
   }
+
+  const effectivePeriodeId = form.watch("periodeId");
 
   return (
     <Form {...form}>
@@ -109,7 +130,7 @@ export function MahasiswaForm({
                   <Input
                     placeholder="12345"
                     {...field}
-                    disabled={!!initialData}
+                    disabled={!!initialData || isLoading}
                   />
                 </FormControl>
                 <FormMessage />
@@ -124,7 +145,11 @@ export function MahasiswaForm({
               <FormItem>
                 <FormLabel>Nama</FormLabel>
                 <FormControl>
-                  <Input placeholder="Nama Mahasiswa" {...field} />
+                  <Input
+                    placeholder="Nama Mahasiswa"
+                    {...field}
+                    disabled={isLoading}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -134,23 +159,31 @@ export function MahasiswaForm({
 
         <FormField
           control={form.control}
-          name="periodeId_periode"
+          name="periodeId"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Periode</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <Select
+                onValueChange={field.onChange}
+                value={field.value}
+                disabled={!!initialData || !!periodeId || isLoading}
+              >
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Pilih periode" />
+                    {isPeriodeLoading ? (
+                      <div className="flex items-center">
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        <span>Memuat periode...</span>
+                      </div>
+                    ) : (
+                      <SelectValue placeholder="Pilih periode" />
+                    )}
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {periodeList.map((periode) => (
-                    <SelectItem
-                      key={periode.id_periode}
-                      value={periode.id_periode}
-                    >
-                      {periode.tahun} Semester {periode.semester}
+                  {periodeList?.map((periode) => (
+                    <SelectItem key={periode.id} value={periode.id}>
+                      {`Periode ${periode.kode_periode} - ${periode.tahun}`}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -175,6 +208,7 @@ export function MahasiswaForm({
                     step="0.01"
                     placeholder="80"
                     {...field}
+                    disabled={isLoading}
                   />
                 </FormControl>
                 <FormDescription>Skala 0-100</FormDescription>
@@ -197,6 +231,7 @@ export function MahasiswaForm({
                     step="0.01"
                     placeholder="90"
                     {...field}
+                    disabled={isLoading}
                   />
                 </FormControl>
                 <FormDescription>Persentase 0-100</FormDescription>
@@ -218,6 +253,7 @@ export function MahasiswaForm({
                     max={5}
                     placeholder="0"
                     {...field}
+                    disabled={isLoading}
                   />
                 </FormControl>
                 <FormDescription>Skala 0-5</FormDescription>
@@ -239,6 +275,7 @@ export function MahasiswaForm({
                     max={5}
                     placeholder="0"
                     {...field}
+                    disabled={isLoading}
                   />
                 </FormControl>
                 <FormDescription>Skala 0-5</FormDescription>
@@ -260,6 +297,7 @@ export function MahasiswaForm({
                     max={5}
                     placeholder="1"
                     {...field}
+                    disabled={isLoading}
                   />
                 </FormControl>
                 <FormDescription>Skala 1-5</FormDescription>
@@ -281,6 +319,7 @@ export function MahasiswaForm({
                     max={5}
                     placeholder="1"
                     {...field}
+                    disabled={isLoading}
                   />
                 </FormControl>
                 <FormDescription>Skala 1-5</FormDescription>
@@ -289,13 +328,13 @@ export function MahasiswaForm({
             )}
           />
         </div>
-
-        <Button type="submit" disabled={isLoading}>
-          {isLoading
-            ? "Menyimpan..."
-            : initialData
-              ? "Update Data"
-              : "Tambah Data"}
+        <Button
+          type="submit"
+          disabled={!effectivePeriodeId || isLoading}
+          className="w-full"
+        >
+          {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          {initialData ? "Simpan Perubahan" : "Tambah Mahasiswa"}
         </Button>
       </form>
     </Form>

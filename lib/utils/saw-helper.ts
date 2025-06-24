@@ -41,16 +41,14 @@ export async function getNormalizedSAWData(
       if (!latestPeriode) {
         throw new Error("No periode found");
       }
-      periodeId = latestPeriode.id_periode;
+      periodeId = latestPeriode.id;
     }
 
     // Get periode data with weights
     const periode = await prisma.periode.findUnique({
       where: {
-        id_periode_userId: {
-          id_periode: periodeId,
-          userId: userId,
-        },
+        id: periodeId,
+        userId: userId,
       },
       include: {
         mahasiswa: {
@@ -157,7 +155,7 @@ export function formatSAWDataForAI(data: NormalizedSAWResult[]): string {
 
   markdown += "## Informasi Periode\n";
   markdown += `- Total Mahasiswa: ${data.length}\n`;
-  markdown += `- Periode: ${data[0]?.mahasiswa.periodeId_periode}\n\n`;
+  markdown += `- Periode: ${data[0]?.mahasiswa.periodeId}\n\n`;
 
   markdown += "## Peringkat Mahasiswa\n\n";
   markdown +=

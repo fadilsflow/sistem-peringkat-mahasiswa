@@ -14,6 +14,7 @@ datasource db {
 }
 
 model Mahasiswa {
+  id                   String   @id @default(uuid())
   nim                  String
   nama                 String
   nilai_akademik       Float
@@ -23,16 +24,19 @@ model Mahasiswa {
   perilaku             Int
   keaktifan_organisasi Int
   tanggal_input        DateTime
-  periode              Periode  @relation(fields: [periodeId_periode, userId], references: [id_periode, userId])
-  periodeId_periode    String
+  periodeId            String
   userId               String
 
-  @@id([nim, periodeId_periode, userId])
-  @@index([periodeId_periode, userId])
+  periode Periode @relation(fields: [periodeId], references: [id], onDelete: Cascade)
+
+  @@unique([nim, periodeId])
+  @@index([periodeId])
+  @@index([userId])
 }
 
 model Periode {
-  id_periode              String
+  id                      String      @id @default(uuid())
+  kode_periode            String
   tahun                   String
   semester                Int
   w1_nilai_akademik       Float
@@ -45,7 +49,8 @@ model Periode {
   mahasiswa               Mahasiswa[]
   userId                  String
 
-  @@id([id_periode, userId])
+  @@index([userId])
+  @@index([kode_periode])
 }
 
 model AIChatSession {

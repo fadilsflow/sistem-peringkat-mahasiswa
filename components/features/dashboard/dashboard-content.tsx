@@ -74,7 +74,7 @@ export function DashboardContent() {
   // Set initial periode
   React.useEffect(() => {
     if (!isPeriodeLoading && periodeList.length > 0 && !selectedPeriodeId) {
-      setSelectedPeriodeId(periodeList[0].id_periode);
+      setSelectedPeriodeId(periodeList[0].id);
     }
   }, [periodeList, isPeriodeLoading, selectedPeriodeId]);
 
@@ -121,9 +121,7 @@ export function DashboardContent() {
     );
   }
 
-  const activePeriode = periodeList.find(
-    (p) => p.id_periode === selectedPeriodeId
-  );
+  const activePeriode = periodeList.find((p) => p.id === selectedPeriodeId);
 
   const topMahasiswa =
     mahasiswaList.length > 0 && activePeriode
@@ -198,8 +196,8 @@ export function DashboardContent() {
             </SelectTrigger>
             <SelectContent>
               {periodeList.map((periode) => (
-                <SelectItem key={periode.id_periode} value={periode.id_periode}>
-                  Periode {periode.id_periode} - Tahun {periode.tahun}
+                <SelectItem key={periode.id} value={periode.id}>
+                  Periode {periode.kode_periode} - Tahun {periode.tahun}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -227,8 +225,8 @@ export function DashboardContent() {
           </SelectTrigger>
           <SelectContent>
             {periodeList.map((periode) => (
-              <SelectItem key={periode.id_periode} value={periode.id_periode}>
-                Periode {periode.id_periode} - Tahun {periode.tahun}
+              <SelectItem key={periode.id} value={periode.id}>
+                Periode {periode.kode_periode} - Tahun {periode.tahun}
               </SelectItem>
             ))}
           </SelectContent>

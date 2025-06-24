@@ -172,7 +172,7 @@ export function exportToExcel(data: Mahasiswa[], filename: string) {
       month: "long",
       day: "numeric",
     }),
-    "ID Periode": item.periodeId_periode,
+    "ID Periode": item.periodeId,
   }));
 
   // Create a new workbook

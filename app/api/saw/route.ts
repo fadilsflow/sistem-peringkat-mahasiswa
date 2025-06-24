@@ -24,7 +24,7 @@ export async function GET(request: Request) {
     // Get periode data for weights and verify ownership
     const periode = await prisma.periode.findFirst({
       where: {
-        id_periode: periodeId,
+        id: periodeId,
         userId: userId,
       },
     });
@@ -39,7 +39,7 @@ export async function GET(request: Request) {
     // Get mahasiswa data with userId filter
     const mahasiswa = await prisma.mahasiswa.findMany({
       where: {
-        periodeId_periode: periodeId,
+        periodeId: periodeId,
         userId: userId,
       },
     });

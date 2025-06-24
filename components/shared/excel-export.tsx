@@ -7,15 +7,20 @@ import { Mahasiswa } from "@prisma/client";
 
 interface ExcelExportProps {
   data: Mahasiswa[];
+  filename: string;
 }
 
-export default function ExcelExport({ data }: ExcelExportProps) {
+export default function ExcelExport({ data, filename }: ExcelExportProps) {
   const handleExport = () => {
-    exportToExcel(data, "data-mahasiswa.xlsx");
+    exportToExcel(data, `${filename}.xlsx`);
   };
 
   return (
-    <Button onClick={handleExport} variant="outline">
+    <Button
+      onClick={handleExport}
+      variant="outline"
+      disabled={data.length === 0}
+    >
       <Download className="mr-2 h-4 w-4" />
       Export Excel
     </Button>

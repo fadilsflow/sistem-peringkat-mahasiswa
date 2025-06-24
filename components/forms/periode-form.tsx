@@ -25,7 +25,7 @@ const formatNumber = (num: number) => Number(num.toFixed(2));
 
 const periodeFormSchema = z
   .object({
-    id_periode: z.string().min(1, "ID Periode harus diisi"),
+    kode_periode: z.string().min(1, "Kode Periode harus diisi"),
     tahun: z.string().min(1, "Tahun harus diisi"),
     semester: z.coerce.number().min(1).max(2),
     w1_nilai_akademik: z.coerce
@@ -92,7 +92,7 @@ export function PeriodeForm({ initialData, onSuccess }: PeriodeFormProps) {
   const form = useForm<PeriodeFormValues>({
     resolver: zodResolver(periodeFormSchema),
     defaultValues: {
-      id_periode: initialData?.id_periode || "",
+      kode_periode: initialData?.kode_periode || "",
       tahun:
         initialData?.tahun.toString() || new Date().getFullYear().toString(),
       semester: initialData?.semester || 1,
@@ -114,30 +114,20 @@ export function PeriodeForm({ initialData, onSuccess }: PeriodeFormProps) {
 
     try {
       setIsLoading(true);
-      const periodeData = {
-        ...data,
-        userId, // Add userId to the periode data
-      };
 
       if (initialData) {
-        await updatePeriode(initialData.id_periode, periodeData);
+        await updatePeriode(initialData.id, data);
         toast.success("Periode berhasil diupdate");
       } else {
-        await createPeriode(periodeData);
+        if (!userId) throw new Error("User not authenticated");
+        await createPeriode({ ...data });
         toast.success("Periode berhasil dibuat");
         form.reset();
       }
       onSuccess?.();
     } catch (error: Error | unknown) {
       console.error("Error:", error);
-      if (
-        error instanceof Error &&
-        error.message?.includes("Unique constraint")
-      ) {
-        toast.error("Periode dengan ID tersebut sudah ada untuk user ini");
-      } else {
-        toast.error("Terjadi kesalahan");
-      }
+      toast.error((error as Error)?.message || "Terjadi kesalahan");
     } finally {
       setIsLoading(false);
     }
@@ -151,15 +141,15 @@ export function PeriodeForm({ initialData, onSuccess }: PeriodeFormProps) {
       >
         <FormField
           control={form.control}
-          name="id_periode"
+          name="kode_periode"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>ID Periode</FormLabel>
+              <FormLabel>Kode Periode</FormLabel>
               <FormControl>
-                <Input placeholder="2024-1" {...field} />
+                <Input placeholder="20241" {...field} />
               </FormControl>
               <FormDescription>
-                Format: TAHUN-SEMESTER (contoh: 2024-1)
+                Contoh: 20241 untuk Tahun 2024 Semester 1
               </FormDescription>
               <FormMessage />
             </FormItem>

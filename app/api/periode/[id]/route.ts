@@ -16,7 +16,7 @@ export async function GET(
 
     const periode = await prisma.periode.findFirst({
       where: {
-        id_periode: id,
+        id: id,
         userId: userId,
       },
     });

@@ -99,7 +99,7 @@ export function ManageContent() {
     error: mahasiswaError,
   } = useMahasiswaByPeriode(
     // Only pass the periodeId if it exists in the current list
-    periodeList.some((p) => p.id_periode === selectedPeriodeId)
+    periodeList.some((p) => p.id === selectedPeriodeId)
       ? selectedPeriodeId
       : null
   );
@@ -110,9 +110,9 @@ export function ManageContent() {
       // If no period is selected or selected period doesn't exist anymore
       if (
         !selectedPeriodeId ||
-        !periodeList.some((p) => p.id_periode === selectedPeriodeId)
+        !periodeList.some((p) => p.id === selectedPeriodeId)
       ) {
-        setSelectedPeriodeId(periodeList[0].id_periode);
+        setSelectedPeriodeId(periodeList[0].id);
       }
     } else {
       // If no periods exist, clear selection
@@ -150,7 +150,7 @@ export function ManageContent() {
     try {
       setIsDeleting(true);
       toast.loading("Menghapus periode...");
-      await deletePeriode(periode.id_periode);
+      await deletePeriode(periode.id);
       toast.dismiss();
       toast.success("Periode berhasil dihapus");
 
@@ -158,19 +158,17 @@ export function ManageContent() {
       queryClient.invalidateQueries({ queryKey: ["periodes"] });
 
       // Remove the mahasiswa data for the deleted period from the cache
-      queryClient.setQueryData(["mahasiswa", periode.id_periode], []);
+      queryClient.setQueryData(["mahasiswa", periode.id], []);
       queryClient.invalidateQueries({
-        queryKey: ["mahasiswa", periode.id_periode],
+        queryKey: ["mahasiswa", periode.id],
         exact: true,
       });
 
       // If we're deleting the currently selected periode, select the next available one
-      if (selectedPeriodeId === periode.id_periode) {
-        const updatedPeriodes = periodeList.filter(
-          (p) => p.id_periode !== periode.id_periode
-        );
+      if (selectedPeriodeId === periode.id) {
+        const updatedPeriodes = periodeList.filter((p) => p.id !== periode.id);
         if (updatedPeriodes.length > 0) {
-          setSelectedPeriodeId(updatedPeriodes[0].id_periode);
+          setSelectedPeriodeId(updatedPeriodes[0].id);
         } else {
           setSelectedPeriodeId("");
         }
@@ -182,7 +180,10 @@ export function ManageContent() {
     } catch (error) {
       console.error(error);
       toast.dismiss();
-      toast.error("Gagal menghapus periode");
+      toast.error((error as Error)?.message || "Gagal menghapus periode", {
+        description:
+          "Pastikan tidak ada mahasiswa yang terdaftar di periode ini sebelum menghapus.",
+      });
     } finally {
       setIsDeleting(false);
     }
@@ -262,31 +263,26 @@ export function ManageContent() {
       header: "Aksi",
       cell: ({ row }) => {
         const mahasiswa = row.original;
-
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
+                <span className="sr-only">Buka menu</span>
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+              <DropdownMenuLabel>Aksi</DropdownMenuLabel>
+              <DropdownMenuItem onClick={() => handleEditMahasiswa(mahasiswa)}>
+                Ubah
+              </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => {
                   setMahasiswaToDelete(mahasiswa);
                   setIsDeleteMahasiswaDialogOpen(true);
                 }}
-                className="text-red-600"
               >
                 Hapus
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => handleEditMahasiswa(mahasiswa)}
-                className="text-blue-600"
-              >
-                Edit
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -294,9 +290,10 @@ export function ManageContent() {
       },
     },
   ];
+
   const periodeColumns: PeriodeColumn[] = [
     {
-      accessorKey: "id_periode",
+      accessorKey: "kode_periode",
       header: "ID Periode",
     },
     {
@@ -309,45 +306,27 @@ export function ManageContent() {
     },
     {
       accessorKey: "w1_nilai_akademik",
-      header: "Bobot Nilai",
-      cell: ({ row }) => (
-        <span>{(row.original.w1_nilai_akademik * 100).toFixed(1)}%</span>
-      ),
+      header: "Bobot Nilai Akademik",
     },
     {
       accessorKey: "w2_kehadiran",
       header: "Bobot Kehadiran",
-      cell: ({ row }) => (
-        <span>{(row.original.w2_kehadiran * 100).toFixed(1)}%</span>
-      ),
     },
     {
       accessorKey: "w3_prestasi_akademik",
       header: "Bobot Prestasi Akademik",
-      cell: ({ row }) => (
-        <span>{(row.original.w3_prestasi_akademik * 100).toFixed(1)}%</span>
-      ),
     },
     {
       accessorKey: "w4_prestasi_nonakademik",
-      header: "Bobot Prestasi Non Akademik",
-      cell: ({ row }) => (
-        <span>{(row.original.w4_prestasi_nonakademik * 100).toFixed(1)}%</span>
-      ),
+      header: "Bobot Prestasi Non-akademik",
     },
     {
       accessorKey: "w5_perilaku",
       header: "Bobot Perilaku",
-      cell: ({ row }) => (
-        <span>{(row.original.w5_perilaku * 100).toFixed(1)}%</span>
-      ),
     },
     {
       accessorKey: "w6_keaktifan_organisasi",
       header: "Bobot Keaktifan Organisasi",
-      cell: ({ row }) => (
-        <span>{(row.original.w6_keaktifan_organisasi * 100).toFixed(1)}%</span>
-      ),
     },
     {
       accessorKey: "deskripsi",
@@ -362,26 +341,22 @@ export function ManageContent() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
+                <span className="sr-only">Buka menu</span>
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+              <DropdownMenuLabel>Aksi</DropdownMenuLabel>
+              <DropdownMenuItem onClick={() => handleEditPeriode(periode)}>
+                Ubah
+              </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => {
                   setPeriodeToDelete(periode);
                   setIsDeleteDialogOpen(true);
                 }}
-                className="text-red-600"
               >
-                Delete
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => handleEditPeriode(periode)}
-                className="text-blue-600"
-              >
-                Edit
+                Hapus
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -390,194 +365,224 @@ export function ManageContent() {
     },
   ];
 
+  const handlePeriodeChange = (value: string) => {
+    setSelectedPeriodeId(value);
+  };
+
   return (
     <div className="space-y-8">
       <div>
-        <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-primary">
-          Manajemen Data
-        </h2>
-        <p className="text-muted-foreground mt-2 text-sm">
-          Kelola data mahasiswa dan periode penilaian
+        <h2 className="text-3xl font-bold tracking-tight">Kelola Data</h2>
+        <p className="text-muted-foreground mt-2">
+          Kelola data periode dan mahasiswa yang terdaftar di dalamnya
         </p>
       </div>
 
-      {/* Periode Section */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>Data Periode</CardTitle>
-              <CardDescription>
-                Daftar periode penilaian yang tersedia
-              </CardDescription>
-            </div>
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Tambah Periode
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Tambah Periode Baru</DialogTitle>
-                  <DialogDescription>
-                    Tambahkan periode penilaian baru ke dalam sistem
-                  </DialogDescription>
-                </DialogHeader>
+      <div className="grid grid-cols-1 gap-8">
+        <Card>
+          <CardHeader>
+            <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
+              <div>
+                <CardTitle>Data Periode</CardTitle>
+                <CardDescription>
+                  Daftar periode yang tersedia. Klik tombol di bawah untuk
+                  menambah periode baru.
+                </CardDescription>
+              </div>
 
-                <PeriodeForm onSuccess={handleSuccess} />
-              </DialogContent>
-            </Dialog>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <DataTable
-            columns={periodeColumns}
-            data={periodeList}
-            filterColumn="tahun"
-            filterPlaceholder="Filter tahun..."
-          />
-        </CardContent>
-      </Card>
-
-      {/* Mahasiswa Section */}
-      <Card>
-        <CardHeader>
-          <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
-            <div>
-              <CardTitle>Data Mahasiswa</CardTitle>
-              <CardDescription>
-                Kelola data mahasiswa berdasarkan periode yang dipilih
-              </CardDescription>
-            </div>
-            <Select
-              value={selectedPeriodeId}
-              onValueChange={setSelectedPeriodeId}
-            >
-              <SelectTrigger className="w-full sm:w-[350px]">
-                <Calendar className="mr-2 h-4 w-4" />
-                <SelectValue placeholder="Pilih Periode" />
-              </SelectTrigger>
-              <SelectContent>
-                {periodeList.map((periode) => (
-                  <SelectItem
-                    key={periode.id_periode}
-                    value={periode.id_periode}
-                  >
-                    Periode {periode.id_periode} - Tahun {periode.tahun}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          {selectedPeriodeId && (
-            <div className="mt-4 grid grid-cols-2 sm:flex  gap-4">
-              <Dialog
-                open={isImportDialogOpen}
-                onOpenChange={setIsImportDialogOpen}
-              >
-                <DialogTrigger asChild>
-                  <Button variant="outline">
-                    <Upload className="mr-2 h-4 w-4" />
-                    Import Excel
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Import Data Mahasiswa</DialogTitle>
-                    <DialogDescription>
-                      Upload file Excel untuk menambahkan data mahasiswa secara
-                      massal
-                    </DialogDescription>
-                  </DialogHeader>
-                  <ExcelImport
-                    periodeId={selectedPeriodeId}
-                    onSuccess={() => {
-                      setIsImportDialogOpen(false);
-                      queryClient.invalidateQueries({
-                        queryKey: ["mahasiswa", selectedPeriodeId],
-                        exact: true,
-                      });
-                      toast.success("Data mahasiswa berhasil diimpor");
-                    }}
-                  />
-                </DialogContent>
-              </Dialog>
-              <ExcelExport data={mahasiswaList} />
               <Dialog>
                 <DialogTrigger asChild>
                   <Button>
                     <Plus className="mr-2 h-4 w-4" />
-                    Tambah Mahasiswa
+                    Tambah Periode
                   </Button>
                 </DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
-                    <DialogTitle>Tambah Mahasiswa Baru</DialogTitle>
-                    <DialogDescription>
-                      Tambahkan data mahasiswa baru ke dalam sistem
-                    </DialogDescription>
+                    <DialogTitle>Tambah Periode Baru</DialogTitle>
                   </DialogHeader>
-                  <MahasiswaForm
-                    periodeList={periodeList}
-                    onSuccess={handleSuccess}
-                  />
+                  <PeriodeForm onSuccess={handleSuccess} />
                 </DialogContent>
               </Dialog>
             </div>
-          )}
-        </CardHeader>
-        <CardContent>
-          <DataTable
-            columns={mahasiswaColumns}
-            data={mahasiswaList}
-            filterColumn="nama"
-            filterPlaceholder="Filter nama..."
-          />
-        </CardContent>
-      </Card>
+          </CardHeader>
+          <CardContent>
+            {isPeriodeError ? (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertTitle>Error Memuat Periode</AlertTitle>
+                <AlertDescription>
+                  {(periodeError as Error)?.message ||
+                    "Gagal memuat daftar periode."}
+                </AlertDescription>
+              </Alert>
+            ) : (
+              <DataTable
+                columns={periodeColumns}
+                data={periodeList}
+                filterColumn="deskripsi"
+                filterPlaceholder="Cari berdasarkan deskripsi..."
+              />
+            )}
+          </CardContent>
+        </Card>
 
-      {/* Delete Confirmation Dialog */}
+        {/* Section Mahasiswa */}
+        <Card>
+          <CardHeader>
+            <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
+              <div>
+                <CardTitle>Data Mahasiswa</CardTitle>
+                <CardDescription>
+                  Pilih periode untuk melihat dan mengelola data mahasiswa
+                </CardDescription>
+              </div>
+              <Select
+                value={selectedPeriodeId}
+                onValueChange={handlePeriodeChange}
+              >
+                <SelectTrigger className="w-full sm:w-[350px]">
+                  <Calendar className="mr-2 h-4 w-4" />
+                  <SelectValue placeholder="Pilih Periode" />
+                </SelectTrigger>
+                <SelectContent>
+                  {periodeList.map((periode) => (
+                    <SelectItem key={periode.id} value={periode.id}>
+                      Periode {periode.kode_periode} - Tahun {periode.tahun}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            {selectedPeriodeId && (
+              <div className="mt-4 flex flex-wrap items-center gap-4">
+                <Dialog
+                  open={isImportDialogOpen}
+                  onOpenChange={setIsImportDialogOpen}
+                >
+                  <DialogTrigger asChild>
+                    <Button variant="outline">
+                      <Upload className="mr-2 h-4 w-4" />
+                      Import Excel
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Import Data Mahasiswa</DialogTitle>
+                    </DialogHeader>
+                    <ExcelImport
+                      onSuccess={() => {
+                        handleSuccess();
+                        setIsImportDialogOpen(false);
+                      }}
+                      periodeId={selectedPeriodeId}
+                    />
+                  </DialogContent>
+                </Dialog>
+
+                <ExcelExport
+                  data={mahasiswaList}
+                  filename={`mahasiswa_${selectedPeriodeId}`}
+                />
+
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button>
+                      <Plus className="mr-2 h-4 w-4" />
+                      Tambah Mahasiswa
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Tambah Data Mahasiswa</DialogTitle>
+                    </DialogHeader>
+                    <MahasiswaForm
+                      onSuccess={handleSuccess}
+                      periodeId={selectedPeriodeId}
+                    />
+                  </DialogContent>
+                </Dialog>
+              </div>
+            )}
+          </CardHeader>
+          <CardContent>
+            {!selectedPeriodeId ? (
+              <div className="text-center text-muted-foreground">
+                <p>Pilih periode untuk menampilkan data mahasiswa.</p>
+              </div>
+            ) : isMahasiswaError ? (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertTitle>Error Memuat Mahasiswa</AlertTitle>
+                <AlertDescription>
+                  {(mahasiswaError as Error)?.message ||
+                    "Gagal memuat data mahasiswa untuk periode ini."}
+                </AlertDescription>
+              </Alert>
+            ) : (
+              <DataTable
+                columns={mahasiswaColumns}
+                data={mahasiswaList}
+                filterColumn="nama"
+                filterPlaceholder="Cari mahasiswa..."
+              />
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Edit Periode Dialog */}
       <Dialog
-        open={isDeleteDialogOpen}
-        onOpenChange={(open) => {
-          if (!isDeleting) {
-            setIsDeleteDialogOpen(open);
-            if (!open) setPeriodeToDelete(null);
-          }
-        }}
+        open={isEditPeriodeDialogOpen}
+        onOpenChange={setIsEditPeriodeDialogOpen}
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Konfirmasi Hapus</DialogTitle>
-            <DialogDescription asChild>
-              <div className="space-y-2">
-                <p>Apakah Anda yakin ingin menghapus periode ini?</p>
-                {periodeToDelete && (
-                  <div className="rounded-lg border p-3">
-                    <p>
-                      <strong>Periode:</strong> {periodeToDelete.tahun} -
-                      Semester {periodeToDelete.semester}
-                    </p>
-                    <p>
-                      <strong>Deskripsi:</strong>{" "}
-                      {periodeToDelete.deskripsi || "-"}
-                    </p>
-                    <p className="text-red-500 mt-2">
-                      Perhatian: Semua data mahasiswa dalam periode ini akan
-                      ikut terhapus!
-                    </p>
-                  </div>
-                )}
-              </div>
+            <DialogTitle>Ubah Data Periode</DialogTitle>
+          </DialogHeader>
+          {selectedPeriode && (
+            <PeriodeForm
+              initialData={selectedPeriode}
+              onSuccess={handleSuccess}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Mahasiswa Dialog */}
+      <Dialog
+        open={isEditMahasiswaDialogOpen}
+        onOpenChange={setIsEditMahasiswaDialogOpen}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Ubah Data Mahasiswa</DialogTitle>
+          </DialogHeader>
+          {selectedMahasiswa && selectedPeriodeId && (
+            <MahasiswaForm
+              initialData={selectedMahasiswa}
+              onSuccess={handleSuccess}
+              periodeId={selectedPeriodeId}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Periode Confirmation */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Konfirmasi Penghapusan</DialogTitle>
+            <DialogDescription>
+              Apakah Anda yakin ingin menghapus periode{" "}
+              <strong>{periodeToDelete?.kode_periode}</strong>? Tindakan ini
+              tidak dapat dibatalkan.
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter className="flex items-center gap-2">
+          <DialogFooter>
             <Button
               variant="outline"
               onClick={() => setIsDeleteDialogOpen(false)}
-              disabled={isDeleting}
             >
               Batal
             </Button>
@@ -591,100 +596,29 @@ export function ManageContent() {
               disabled={isDeleting}
             >
               {isDeleting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {isDeleting ? "Menghapus..." : "Hapus"}
+              Hapus
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* Edit Periode Dialog */}
-      <Dialog
-        open={isEditPeriodeDialogOpen}
-        onOpenChange={setIsEditPeriodeDialogOpen}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Edit Periode</DialogTitle>
-            <DialogDescription>
-              Edit data periode yang sudah ada
-            </DialogDescription>
-          </DialogHeader>
-          <PeriodeForm
-            initialData={selectedPeriode || undefined}
-            onSuccess={() => {
-              setIsEditPeriodeDialogOpen(false);
-              setSelectedPeriode(null);
-              handleSuccess();
-            }}
-          />
-        </DialogContent>
-      </Dialog>
-
-      {/* Edit Mahasiswa Dialog */}
-      <Dialog
-        open={isEditMahasiswaDialogOpen}
-        onOpenChange={setIsEditMahasiswaDialogOpen}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Edit Mahasiswa</DialogTitle>
-            <DialogDescription>
-              Edit data mahasiswa yang sudah ada
-            </DialogDescription>
-          </DialogHeader>
-          <MahasiswaForm
-            initialData={selectedMahasiswa || undefined}
-            periodeList={periodeList}
-            onSuccess={() => {
-              setIsEditMahasiswaDialogOpen(false);
-              setSelectedMahasiswa(null);
-              handleSuccess();
-            }}
-          />
-        </DialogContent>
-      </Dialog>
-
-      {/* Delete Mahasiswa Confirmation Dialog */}
+      {/* Delete Mahasiswa Confirmation */}
       <Dialog
         open={isDeleteMahasiswaDialogOpen}
-        onOpenChange={(open) => {
-          if (!isDeleting) {
-            setIsDeleteMahasiswaDialogOpen(open);
-            if (!open) setMahasiswaToDelete(null);
-          }
-        }}
+        onOpenChange={setIsDeleteMahasiswaDialogOpen}
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Konfirmasi Hapus</DialogTitle>
-            <DialogDescription asChild>
-              <div className="space-y-2">
-                <p>Apakah Anda yakin ingin menghapus data mahasiswa ini?</p>
-                {mahasiswaToDelete && (
-                  <div className="rounded-lg border p-3">
-                    <p>
-                      <strong>NIM:</strong> {mahasiswaToDelete.nim}
-                    </p>
-                    <p>
-                      <strong>Nama:</strong> {mahasiswaToDelete.nama}
-                    </p>
-                    <p>
-                      <strong>Nilai Akademik:</strong>{" "}
-                      {mahasiswaToDelete.nilai_akademik}
-                    </p>
-                    <p>
-                      <strong>Kehadiran:</strong> {mahasiswaToDelete.kehadiran}%
-                    </p>
-                  </div>
-                )}
-              </div>
+            <DialogTitle>Konfirmasi Penghapusan</DialogTitle>
+            <DialogDescription>
+              Apakah Anda yakin ingin menghapus mahasiswa dengan NIM{" "}
+              <strong>{mahasiswaToDelete?.nim}</strong>?
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter className="flex items-center gap-2">
+          <DialogFooter>
             <Button
               variant="outline"
               onClick={() => setIsDeleteMahasiswaDialogOpen(false)}
-              disabled={isDeleting}
             >
               Batal
             </Button>
@@ -698,7 +632,7 @@ export function ManageContent() {
               disabled={isDeleting}
             >
               {isDeleting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {isDeleting ? "Menghapus..." : "Hapus"}
+              Hapus
             </Button>
           </DialogFooter>
         </DialogContent>

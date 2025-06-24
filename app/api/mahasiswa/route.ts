@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
     // Verify the periode belongs to the current user
     const periode = await prisma.periode.findFirst({
       where: {
-        id_periode: periodeId,
+        id: periodeId,
         userId: userId,
       },
     });
@@ -37,10 +37,8 @@ export async function GET(request: NextRequest) {
 
     const mahasiswa = await prisma.mahasiswa.findMany({
       where: {
-        periodeId_periode: periodeId,
-        periode: {
-          userId: userId,
-        },
+        periodeId: periodeId,
+        userId: userId,
       },
       include: {
         periode: true,
