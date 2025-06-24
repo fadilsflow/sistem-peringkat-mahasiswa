@@ -109,11 +109,7 @@ export function PeriodeForm({ initialData, onSuccess }: PeriodeFormProps) {
             <FormItem>
               <FormLabel>ID Periode</FormLabel>
               <FormControl>
-                <Input
-                  placeholder="2024-1"
-                  {...field}
-                  //   disabled={!!initialData}
-                />
+                <Input placeholder="2024-1" {...field} />
               </FormControl>
               <FormDescription>
                 Format: TAHUN-SEMESTER (contoh: 2024-1)

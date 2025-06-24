@@ -216,7 +216,7 @@ export function MahasiswaContent() {
               value={selectedPeriodeId}
               onValueChange={setSelectedPeriodeId}
             >
-              <SelectTrigger className="w-[240px]">
+              <SelectTrigger className="w-full sm:w-[350px]">
                 <School className="mr-2 h-4 w-4" />
                 <SelectValue placeholder="Pilih Periode" />
               </SelectTrigger>
@@ -226,7 +226,7 @@ export function MahasiswaContent() {
                     key={periode.id_periode}
                     value={periode.id_periode}
                   >
-                    {periode.tahun} - Semester {periode.semester}
+                    Periode {periode.id_periode} - Tahun {periode.tahun}
                   </SelectItem>
                 ))}
               </SelectContent>

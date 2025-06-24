@@ -198,7 +198,7 @@ export function DashboardContent() {
             <SelectContent>
               {periodeList.map((periode) => (
                 <SelectItem key={periode.id_periode} value={periode.id_periode}>
-                  {periode.tahun} Semester {periode.semester}
+                  Periode {periode.id_periode} - Tahun {periode.tahun}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -220,14 +220,14 @@ export function DashboardContent() {
           </p>
         </div>
         <Select value={selectedPeriodeId} onValueChange={setSelectedPeriodeId}>
-          <SelectTrigger className="w-full sm:w-[200px]">
+          <SelectTrigger className="w-full sm:w-[350px]">
             <Calendar className="mr-2 h-4 w-4" />
             <SelectValue placeholder="Pilih Periode" />
           </SelectTrigger>
           <SelectContent>
             {periodeList.map((periode) => (
               <SelectItem key={periode.id_periode} value={periode.id_periode}>
-                {periode.tahun} Semester {periode.semester}
+                Periode {periode.id_periode} - Tahun {periode.tahun}
               </SelectItem>
             ))}
           </SelectContent>

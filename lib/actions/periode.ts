@@ -65,6 +65,7 @@ export async function createPeriode(data: {
 export async function updatePeriode(
   id: string,
   data: {
+    id_periode?: string;
     tahun: string;
     semester: number;
     w1_nilai_akademik: number;
@@ -82,15 +83,99 @@ export async function updatePeriode(
     throw new Error("Unauthorized");
   }
 
-  await prisma.periode.update({
-    where: {
-      id_periode: id,
-      userId: userId,
-    },
-    data,
-  });
+  // If id_periode is being changed, we need to update all related records
+  if (data.id_periode && data.id_periode !== id) {
+    try {
+      return await prisma.$transaction(async (tx) => {
+        // First, get all mahasiswa records for this period
+        const mahasiswaList = await tx.mahasiswa.findMany({
+          where: {
+            periodeId_periode: id,
+          },
+        });
+
+        // Check for conflicts in target period
+        const existingNims = await tx.mahasiswa.findMany({
+          where: {
+            periodeId_periode: data.id_periode,
+            nim: {
+              in: mahasiswaList.map((m) => m.nim),
+            },
+          },
+          select: {
+            nim: true,
+          },
+        });
+
+        if (existingNims.length > 0) {
+          throw new Error(
+            `Beberapa mahasiswa sudah terdaftar di periode target: ${existingNims.map((e) => e.nim).join(", ")}`
+          );
+        }
+
+        // Delete all existing mahasiswa records for this period
+        await tx.mahasiswa.deleteMany({
+          where: {
+            periodeId_periode: id,
+          },
+        });
+
+        // Update the periode
+        const updatedPeriode = await tx.periode.update({
+          where: {
+            id_periode: id,
+            userId: userId,
+          },
+          data: {
+            ...data,
+            id_periode: data.id_periode,
+          },
+        });
+
+        // Create new mahasiswa records one by one to avoid batch issues
+        if (mahasiswaList.length > 0) {
+          for (const mahasiswa of mahasiswaList) {
+            await tx.mahasiswa.create({
+              data: {
+                nim: mahasiswa.nim,
+                nama: mahasiswa.nama,
+                nilai_akademik: mahasiswa.nilai_akademik,
+                kehadiran: mahasiswa.kehadiran,
+                prestasi_akademik: mahasiswa.prestasi_akademik,
+                prestasi_nonakademik: mahasiswa.prestasi_nonakademik,
+                perilaku: mahasiswa.perilaku,
+                keaktifan_organisasi: mahasiswa.keaktifan_organisasi,
+                tanggal_input: mahasiswa.tanggal_input,
+                periodeId_periode: updatedPeriode.id_periode,
+              },
+            });
+          }
+        }
+
+        return updatedPeriode;
+      });
+    } catch (error) {
+      console.error("Error updating periode:", error);
+      if (error instanceof Error) {
+        throw new Error(`Gagal mengupdate periode: ${error.message}`);
+      }
+      throw new Error("Gagal mengupdate periode");
+    }
+  } else {
+    // If not changing ID, just update normally
+    const { ...updateData } = data;
+    await prisma.periode.update({
+      where: {
+        id_periode: id,
+        userId: userId,
+      },
+      data: updateData,
+    });
+  }
+
   revalidatePath("/periode");
   revalidatePath("/dashboard");
+  revalidatePath("/mahasiswa");
 }
 
 export async function deletePeriode(id: string) {

@@ -27,6 +27,7 @@ import {
   Download,
   MoreHorizontal,
   Loader2,
+  Calendar,
 } from "lucide-react";
 import { MahasiswaForm } from "@/components/forms/mahasiswa-form";
 import { PeriodeForm } from "@/components/forms/periode-form";
@@ -455,7 +456,8 @@ export function ManageContent() {
               value={selectedPeriodeId}
               onValueChange={setSelectedPeriodeId}
             >
-              <SelectTrigger className="w-[240px]">
+              <SelectTrigger className="w-full sm:w-[350px]">
+                <Calendar className="mr-2 h-4 w-4" />
                 <SelectValue placeholder="Pilih Periode" />
               </SelectTrigger>
               <SelectContent>
@@ -464,14 +466,14 @@ export function ManageContent() {
                     key={periode.id_periode}
                     value={periode.id_periode}
                   >
-                    {periode.id_periode} - {periode.tahun}
+                    Periode {periode.id_periode} - Tahun {periode.tahun}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
           {selectedPeriodeId && (
-            <div className="mt-4 flex flex-wrap items-center gap-4">
+            <div className="mt-4 grid grid-cols-2 sm:flex  gap-4">
               <Dialog
                 open={isImportDialogOpen}
                 onOpenChange={setIsImportDialogOpen}
