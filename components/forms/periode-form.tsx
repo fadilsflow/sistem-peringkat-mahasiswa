@@ -128,9 +128,12 @@ export function PeriodeForm({ initialData, onSuccess }: PeriodeFormProps) {
         form.reset();
       }
       onSuccess?.();
-    } catch (error: any) {
+    } catch (error: Error | unknown) {
       console.error("Error:", error);
-      if (error.message?.includes("Unique constraint")) {
+      if (
+        error instanceof Error &&
+        error.message?.includes("Unique constraint")
+      ) {
         toast.error("Periode dengan ID tersebut sudah ada untuk user ini");
       } else {
         toast.error("Terjadi kesalahan");

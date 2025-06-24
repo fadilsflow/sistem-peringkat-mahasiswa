@@ -5,13 +5,13 @@ import CTA from "@/components/shared/cta";
 import { JsonLd } from "@/components/shared/json-ld";
 
 export const metadata: Metadata = {
-  title: "SyncRank - Sistem Peringkat Mahasiswa Terpercaya",
+  title: "SyncRank - Sistem Peringkat Mahasiswa dengan AI",
   description:
-    "Platform lengkap untuk mengelola dan mengevaluasi prestasi akademik mahasiswa dengan metode SAW yang akurat dan terpercaya. Optimalkan penilaian akademik Anda sekarang!",
+    "Platform modern untuk mengelola dan mengevaluasi prestasi akademik mahasiswa menggunakan kecerdasan buatan dan metode SAW. Dapatkan insight mendalam dan rekomendasi yang akurat untuk setiap mahasiswa!",
   openGraph: {
-    title: "SyncRank - Sistem Peringkat Mahasiswa Terpercaya",
+    title: "SyncRank - Sistem Peringkat Mahasiswa dengan AI",
     description:
-      "Platform lengkap untuk mengelola dan mengevaluasi prestasi akademik mahasiswa dengan metode SAW yang akurat dan terpercaya.",
+      "Platform modern untuk mengelola dan mengevaluasi prestasi akademik mahasiswa menggunakan kecerdasan buatan dan metode SAW. Optimalkan penilaian akademik dengan AI!",
   },
 };
 
@@ -25,7 +25,7 @@ export default function Home() {
           name: "SyncRank",
           applicationCategory: "Education",
           description:
-            "Sistem Pendukung Keputusan Peringkat Mahasiswa menggunakan Metode SAW",
+            "Sistem Pendukung Keputusan Peringkat Mahasiswa Modern dengan AI dan Metode SAW",
           operatingSystem: "Any",
           author: {
             "@type": "Person",
@@ -47,11 +47,12 @@ export default function Home() {
         <div className="container mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-light text-primary mb-4">
-              Fitur Utama
+              Fitur Unggulan
             </h2>
-            <p className=" max-w-2xl mx-auto text-primary">
-              Platform lengkap untuk mengelola dan mengevaluasi prestasi
-              akademik mahasiswa dengan metode SAW yang akurat dan terpercaya.
+            <p className="max-w-2xl mx-auto text-primary">
+              Optimalkan penilaian akademik dengan bantuan kecerdasan buatan dan
+              metode SAW yang akurat. Dapatkan insight mendalam dan rekomendasi
+              yang tepat untuk setiap mahasiswa.
             </p>
           </div>
           <FeaturesSection />

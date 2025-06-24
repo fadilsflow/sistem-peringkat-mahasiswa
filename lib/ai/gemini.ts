@@ -23,6 +23,12 @@ export async function getGeminiResponse(
 
     // Get SAW data
     const sawData = await getNormalizedSAWData(periodeId, userId);
+
+    // Check if there are no students
+    if (!sawData || sawData.length === 0) {
+      return "Maaf, saya tidak dapat memberikan analisis karena periode ini belum memiliki data mahasiswa. Silakan tambahkan data mahasiswa terlebih dahulu di menu Kelola Data.";
+    }
+
     const sawContext = formatSAWDataForAI(sawData);
 
     // Add SAW data as system context

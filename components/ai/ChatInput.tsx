@@ -53,16 +53,19 @@ export function ChatInput({ onSend, isLoading }: ChatInputProps) {
   };
 
   return (
-    <div className="relative">
+    <div className="relative ">
       <ChatTemplates onSelectTemplate={handleSelectTemplate} />
-      <form onSubmit={handleSubmit} className="relative flex items-end gap-2">
+      <form
+        onSubmit={handleSubmit}
+        className="relative flex items-end gap-2  bg-card text-foreground rounded-lg"
+      >
         <Textarea
           ref={textareaRef}
           value={message}
           onChange={handleInput}
           onKeyDown={handleKeyDown}
           placeholder="Tanyakan tentang data mahasiswa... (Enter untuk kirim, Shift+Enter untuk baris baru)"
-          className="min-h-[52px] max-h-[200px] resize-none py-3 pr-12 text-base"
+          className="min-h-[52px] max-h-[200px] resize-none py-3 pr-12 text-foreground placeholder:text-foreground/50"
           disabled={isLoading}
         />
         <Button

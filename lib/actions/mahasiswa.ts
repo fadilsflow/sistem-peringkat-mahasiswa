@@ -112,15 +112,21 @@ export async function createMahasiswa(data: CreateMahasiswaData) {
     }
 
     // Create new mahasiswa
-    const { periodeId_periode, ...mahasiswaData } = data;
     await prisma.mahasiswa.create({
       data: {
-        ...mahasiswaData,
+        nim: data.nim,
+        nama: data.nama,
+        nilai_akademik: data.nilai_akademik,
+        kehadiran: data.kehadiran,
+        prestasi_akademik: data.prestasi_akademik,
+        prestasi_nonakademik: data.prestasi_nonakademik,
+        perilaku: data.perilaku,
+        keaktifan_organisasi: data.keaktifan_organisasi,
         tanggal_input: new Date(),
         periode: {
           connect: {
             id_periode_userId: {
-              id_periode: periodeId_periode,
+              id_periode: data.periodeId_periode,
               userId: userId,
             },
           },
@@ -172,7 +178,7 @@ export async function updateMahasiswa(
     throw new Error("Periode not found or access denied");
   }
 
-  const { periodeId_periode, ...updateData } = data;
+  const { ...updateData } = data;
   await prisma.mahasiswa.updateMany({
     where: {
       nim,
@@ -273,15 +279,21 @@ export async function createMahasiswaBulk(data: CreateMahasiswaData[]) {
     // Create all mahasiswa records in a single transaction
     await prisma.$transaction(async (tx) => {
       for (const item of data) {
-        const { periodeId_periode, ...mahasiswaData } = item;
         await tx.mahasiswa.create({
           data: {
-            ...mahasiswaData,
+            nim: item.nim,
+            nama: item.nama,
+            nilai_akademik: item.nilai_akademik,
+            kehadiran: item.kehadiran,
+            prestasi_akademik: item.prestasi_akademik,
+            prestasi_nonakademik: item.prestasi_nonakademik,
+            perilaku: item.perilaku,
+            keaktifan_organisasi: item.keaktifan_organisasi,
             tanggal_input: new Date(),
             periode: {
               connect: {
                 id_periode_userId: {
-                  id_periode: periodeId,
+                  id_periode: item.periodeId_periode,
                   userId: userId,
                 },
               },

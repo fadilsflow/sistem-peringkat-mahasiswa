@@ -1,10 +1,8 @@
 import { prisma } from "@/lib/db";
 import { Mahasiswa } from "@prisma/client";
 
-interface SAWData extends Mahasiswa {}
-
 interface NormalizedSAWResult {
-  mahasiswa: SAWData;
+  mahasiswa: Mahasiswa;
   normalizedValues: {
     nilai_akademik: number;
     kehadiran: number;

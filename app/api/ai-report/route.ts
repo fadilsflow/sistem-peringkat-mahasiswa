@@ -1,9 +1,9 @@
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/db";
 import { getGeminiResponse } from "@/lib/ai/gemini";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
     const { userId } = await auth();
     if (!userId) {
@@ -84,7 +84,7 @@ export async function POST(req: Request) {
   }
 }
 
-export async function GET(req: Request) {
+export async function GET(req: NextRequest) {
   try {
     const { userId } = await auth();
     if (!userId) {
@@ -119,6 +119,52 @@ export async function GET(req: Request) {
     console.error("Error fetching chat sessions:", error);
     return NextResponse.json(
       { error: "Failed to fetch sessions" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(req: NextRequest) {
+  try {
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { searchParams } = new URL(req.url);
+    const sessionId = searchParams.get("sessionId");
+
+    if (!sessionId) {
+      return NextResponse.json(
+        { error: "Session ID is required" },
+        { status: 400 }
+      );
+    }
+
+    // Check if session exists and belongs to user
+    const session = await prisma.aIChatSession.findUnique({
+      where: { id: sessionId },
+    });
+
+    if (!session || session.userId !== userId) {
+      return NextResponse.json({ error: "Session not found" }, { status: 404 });
+    }
+
+    // Delete all messages first (due to foreign key constraint)
+    await prisma.aIChatMessage.deleteMany({
+      where: { sessionId },
+    });
+
+    // Delete the session
+    await prisma.aIChatSession.delete({
+      where: { id: sessionId },
+    });
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("Error deleting chat session:", error);
+    return NextResponse.json(
+      { error: "Failed to delete session" },
       { status: 500 }
     );
   }

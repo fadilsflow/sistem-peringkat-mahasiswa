@@ -24,6 +24,7 @@ import {
   Users,
   Award,
   Calendar,
+  ArrowRight,
 } from "lucide-react";
 import {
   Select,
@@ -296,6 +297,32 @@ export function DashboardContent() {
           </Card>
         </>
       </div>
+
+      <Card className="w-full bg-gradient-to-r from-primary/10 via-primary/5 to-background border-primary/20">
+        <CardHeader>
+          <CardTitle className="text-lg md:text-xl flex items-center gap-2">
+            <span className="bg-primary/10 p-2 rounded-lg">🤖</span>
+            <span>Coba Fitur AI Report!</span>
+          </CardTitle>
+          <CardDescription className="text-sm">
+            Dapatkan analisis mendalam tentang performa mahasiswa menggunakan
+            kecerdasan buatan. AI Report akan membantu Anda memahami tren, pola,
+            dan rekomendasi untuk peningkatan akademik.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex justify-end">
+          <Button
+            asChild
+            variant="default"
+            className="bg-primary hover:bg-primary/90"
+          >
+            <Link href="/ai-report" className="flex items-center gap-2">
+              Buat AI Report
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </Button>
+        </CardContent>
+      </Card>
 
       <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
         <Card className="w-full">

@@ -6,7 +6,7 @@ import { Button } from "./button";
 import Link from "next/link";
 import Image from "next/image";
 import { Badge } from "./badge";
-import { Rocket } from "lucide-react";
+import { Sparkles } from "lucide-react";
 
 export default function Hero() {
   return (
@@ -19,15 +19,15 @@ export default function Hero() {
             transition={{ duration: 0.3, delay: 0.2 }}
           >
             <Badge variant="outline" className="text-primary">
-              <Rocket className="h-3 w-3 sm:h-4 sm:w-4" />{" "}
+              <Sparkles className="h-3 w-3 sm:h-4 sm:w-4" />{" "}
               <span className="text-xs sm:text-sm font-bold">
-                Akurat & Cepat
+                Evaluasi Prestasi Akademik dengan AI
               </span>
             </Badge>
           </motion.div>
         </div>
-        <h1 className="z-10  text-center max-w-[280px] xs:max-w-sm sm:max-w-xl lg:max-w-2xl mx-auto text-xl sm:text-2xl md:text-3xl lg:text-5xl font-medium text-primary">
-          {"Sistem Peringkat Mahasiswa dengan Metode SAW"
+        <h1 className="z-10 text-center max-w-[280px] xs:max-w-sm sm:max-w-xl lg:max-w-2xl mx-auto text-xl sm:text-2xl md:text-3xl lg:text-5xl font-medium text-primary">
+          {"Platform Peringkat Mahasiswa yang Cerdas"
             .split(" ")
             .map((word, index) => (
               <motion.span
@@ -51,7 +51,9 @@ export default function Hero() {
           transition={{ duration: 0.3, delay: 0.8 }}
           className="relative z-10 py-3 sm:py-4 text-center text-sm sm:text-base md:text-lg text-primary max-w-xs sm:max-w-sm md:max-w-xl mx-auto"
         >
-          Hitung ranking mahasiswa dalam hitungan detik dengan syncrank.
+          Evaluasi prestasi akademik jadi lebih mudah dengan metode SAW dan
+          bantuan AI. Dapatkan insight yang akurat dan rekomendasi yang tepat
+          untuk setiap mahasiswa.
         </motion.p>
         <motion.div
           initial={{ opacity: 0 }}

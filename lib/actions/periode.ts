@@ -63,8 +63,8 @@ export async function createPeriode(data: {
     });
     revalidatePath("/periode");
     revalidatePath("/dashboard");
-  } catch (error: any) {
-    if (error.code === "P2002") {
+  } catch (error: Error | unknown) {
+    if (error instanceof Error && "code" in error && error.code === "P2002") {
       throw new Error("Periode dengan ID tersebut sudah ada untuk user ini");
     }
     throw error;
@@ -167,17 +167,15 @@ export async function updatePeriode(
 
         return updatedPeriode;
       });
-    } catch (error) {
-      console.error("Error updating periode:", error);
-      if (error instanceof Error) {
-        throw new Error(`Gagal mengupdate periode: ${error.message}`);
+    } catch (error: Error | unknown) {
+      if (error instanceof Error && "code" in error && error.code === "P2002") {
+        throw new Error("Periode dengan ID tersebut sudah ada untuk user ini");
       }
-      throw new Error("Gagal mengupdate periode");
+      throw error;
     }
   } else {
     // Jika id_periode tidak berubah, update biasa
     try {
-      const { id_periode, ...updateData } = data;
       await prisma.periode.update({
         where: {
           id_periode_userId: {
@@ -186,12 +184,13 @@ export async function updatePeriode(
           },
         },
         data: {
-          ...updateData,
+          ...data,
+          id_periode: undefined,
           userId: userId,
         },
       });
-    } catch (error: any) {
-      if (error.code === "P2002") {
+    } catch (error: Error | unknown) {
+      if (error instanceof Error && "code" in error && error.code === "P2002") {
         throw new Error("Periode dengan ID tersebut sudah ada untuk user ini");
       }
       throw error;

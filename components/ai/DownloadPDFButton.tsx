@@ -22,16 +22,29 @@ export function DownloadPDFButton({
 }: DownloadPDFButtonProps) {
   const handleDownload = () => {
     const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const margin = 20;
+    const textWidth = pageWidth - 2 * margin;
 
-    // Add header with logo (if available)
-    doc.setFontSize(20);
-    doc.setTextColor(44, 62, 80);
-    doc.text("SyncRank - Laporan AI", 20, 20);
+    // Add header with logo and title
+    doc.setFontSize(24);
+    doc.setTextColor(0, 0, 0);
+    doc.text("SyncRank", 20, 20);
 
-    // Add session info
-    doc.setFontSize(12);
-    doc.setTextColor(52, 73, 94);
-    doc.text(`Judul Sesi: ${sessionTitle}`, 20, 35);
+    doc.setFontSize(16);
+    doc.setTextColor(100, 100, 100);
+    doc.text("Laporan Analisis Akademik", 20, 30);
+
+    // Add horizontal line
+    doc.setDrawColor(200, 200, 200);
+    doc.line(20, 35, pageWidth - 20, 35);
+
+    // Add report metadata
+    doc.setFontSize(11);
+    doc.setTextColor(60, 60, 60);
+    doc.text("Informasi Laporan:", 20, 45);
+    doc.setFontSize(10);
+    doc.text(`Judul Analisis: ${sessionTitle.replace("...", "")}`, 20, 55);
     doc.text(
       `Tanggal: ${new Date().toLocaleDateString("id-ID", {
         day: "numeric",
@@ -39,88 +52,145 @@ export function DownloadPDFButton({
         year: "numeric",
       })}`,
       20,
-      42
+      65
     );
 
-    let yPos = 55;
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const margin = 20;
-    const textWidth = pageWidth - 2 * margin;
+    let yPos = 85;
+    let currentQuestion = "";
+    let analysisPoints: string[] = [];
 
-    messages.forEach((msg) => {
-      // Add role header
-      doc.setFontSize(11);
-      doc.setTextColor(44, 62, 80);
-      doc.text(
-        msg.role === "assistant" ? "AI Assistant" : "Pengguna",
-        margin,
-        yPos
-      );
+    messages.forEach((msg, index) => {
+      if (msg.role === "user") {
+        // If there are previous analysis points, add them before starting new question
+        if (analysisPoints.length > 0) {
+          yPos = addAnalysisPoints(doc, analysisPoints, yPos);
+          analysisPoints = [];
+        }
 
-      // Add timestamp
-      doc.setFontSize(9);
-      doc.setTextColor(127, 140, 141);
-      doc.text(
-        new Date(msg.createdAt).toLocaleString("id-ID"),
-        pageWidth - margin - 40,
-        yPos,
-        { align: "right" }
-      );
+        // Add question header
+        if (yPos > doc.internal.pageSize.getHeight() - 40) {
+          doc.addPage();
+          yPos = 20;
+        }
 
-      yPos += 7;
-
-      // Add message content with proper formatting
-      doc.setFontSize(10);
-      doc.setTextColor(52, 73, 94);
-
-      // Split content into lines
-      const lines = doc.splitTextToSize(msg.content, textWidth);
-
-      // Add background for AI messages
-      if (msg.role === "assistant") {
-        doc.setFillColor(244, 246, 248);
-        doc.rect(
-          margin - 5,
-          yPos - 5,
-          pageWidth - 2 * (margin - 5),
-          lines.length * 7 + 10,
-          "F"
-        );
-      }
-
-      // Add text lines
-      lines.forEach((line: string) => {
-        doc.text(line, margin, yPos);
+        doc.setFontSize(12);
+        doc.setTextColor(0, 0, 0);
+        currentQuestion = msg.content;
+        doc.text("Pertanyaan:", margin, yPos);
         yPos += 7;
-      });
 
-      // Add spacing between messages
-      yPos += 10;
+        const questionLines = doc.splitTextToSize(currentQuestion, textWidth);
+        doc.setFontSize(11);
+        doc.setTextColor(60, 60, 60);
+        questionLines.forEach((line: string) => {
+          doc.text(line, margin, yPos);
+          yPos += 7;
+        });
+        yPos += 5;
+      } else {
+        // Process AI response
+        const content = msg.content.replace(/\*\*/g, ""); // Remove markdown bold
 
-      // Check if we need a new page
-      if (yPos > doc.internal.pageSize.getHeight() - 20) {
-        doc.addPage();
-        yPos = 20;
+        // Split content into sections (if it contains bullet points)
+        const sections = content.split("\n");
+
+        sections.forEach((section) => {
+          if (
+            section.trim().startsWith("-") ||
+            section.trim().startsWith("•")
+          ) {
+            // Collect bullet points for later formatting
+            analysisPoints.push(section.trim().replace(/^[-•]\s*/, ""));
+          } else if (section.trim()) {
+            // Regular paragraph
+            if (yPos > doc.internal.pageSize.getHeight() - 40) {
+              doc.addPage();
+              yPos = 20;
+            }
+
+            doc.setFontSize(11);
+            doc.setTextColor(60, 60, 60);
+            const lines = doc.splitTextToSize(section, textWidth);
+            lines.forEach((line: string) => {
+              doc.text(line, margin, yPos);
+              yPos += 7;
+            });
+            yPos += 3;
+          }
+        });
+
+        // Add analysis points if this is the last message or next message is a new question
+        if (
+          index === messages.length - 1 ||
+          messages[index + 1]?.role === "user"
+        ) {
+          yPos = addAnalysisPoints(doc, analysisPoints, yPos);
+          analysisPoints = [];
+          yPos += 10; // Add extra space between QA sections
+        }
       }
     });
 
-    // Add footer
+    // Add footer with page numbers
     const pageCount = doc.internal.pages.length - 1;
     doc.setFontSize(8);
-    doc.setTextColor(127, 140, 141);
+    doc.setTextColor(150, 150, 150);
     for (let i = 1; i <= pageCount; i++) {
       doc.setPage(i);
       doc.text(
         `Halaman ${i} dari ${pageCount}`,
-        doc.internal.pageSize.getWidth() / 2,
+        pageWidth / 2,
         doc.internal.pageSize.getHeight() - 10,
         { align: "center" }
       );
     }
 
     // Save the PDF
-    doc.save(`syncrank-report-${new Date().toISOString().split("T")[0]}.pdf`);
+    doc.save(`syncrank-analisis-${new Date().toISOString().split("T")[0]}.pdf`);
   };
+
+  // Helper function to add analysis points
+  function addAnalysisPoints(
+    doc: jsPDF,
+    points: string[],
+    startY: number
+  ): number {
+    let yPos = startY;
+
+    if (points.length > 0) {
+      if (yPos > doc.internal.pageSize.getHeight() - 40) {
+        doc.addPage();
+        yPos = 20;
+      }
+
+      doc.setFontSize(11);
+      doc.setTextColor(0, 0, 0);
+      doc.text("Analisis:", 20, yPos);
+      yPos += 10;
+
+      doc.setFontSize(10);
+      doc.setTextColor(60, 60, 60);
+      points.forEach((point) => {
+        if (yPos > doc.internal.pageSize.getHeight() - 40) {
+          doc.addPage();
+          yPos = 20;
+        }
+
+        const bulletPoint = "• " + point;
+        const lines = doc.splitTextToSize(
+          bulletPoint,
+          doc.internal.pageSize.getWidth() - 45
+        );
+        lines.forEach((line: string, index: number) => {
+          doc.text(line, index === 0 ? 25 : 27, yPos);
+          yPos += 7;
+        });
+        yPos += 3;
+      });
+    }
+
+    return yPos;
+  }
 
   return (
     <Button

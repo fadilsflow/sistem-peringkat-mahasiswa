@@ -5,6 +5,7 @@ import { SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
+import { ModeToggle } from "./mode-togle";
 
 export function Header() {
   const pathname = usePathname();
@@ -67,6 +68,7 @@ export function Header() {
               )}
               <UserButton />
             </SignedIn>
+            <ModeToggle/>
           </div>
         </div>
       </div>

@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { toast } from "sonner";
 
 interface Message {
   id: string;
@@ -33,6 +34,9 @@ interface Period {
   id_periode: string;
   tahun: number;
   semester: number;
+  _count?: {
+    mahasiswa: number;
+  };
 }
 
 export default function AIReportPage() {
@@ -44,6 +48,7 @@ export default function AIReportPage() {
   const [selectedPeriod, setSelectedPeriod] = useState<string>("");
   const [isPeriodLoading, setIsPeriodLoading] = useState(true);
   const [isPeriodError, setIsPeriodError] = useState(false);
+  const [noStudentsError, setNoStudentsError] = useState<string | null>(null);
 
   // Fetch sessions and periods on mount
   useEffect(() => {
@@ -53,8 +58,8 @@ export default function AIReportPage() {
       setIsPeriodLoading(true);
       setIsPeriodError(false);
       try {
-        // Fetch periods
-        const periodsResponse = await fetch("/api/periode");
+        // Fetch periods with student count
+        const periodsResponse = await fetch("/api/periode?includeCount=true");
         if (!periodsResponse.ok) throw new Error("Failed to fetch periods");
         const periodsData = await periodsResponse.json();
         setPeriods(periodsData);
@@ -76,6 +81,20 @@ export default function AIReportPage() {
     }
     fetchData();
   }, [userId]);
+
+  // Check if selected period has students
+  useEffect(() => {
+    if (selectedPeriod) {
+      const period = periods.find((p) => p.id_periode === selectedPeriod);
+      if (period && period._count?.mahasiswa === 0) {
+        setNoStudentsError(
+          `Periode ${period.id_periode} belum memiliki data mahasiswa`
+        );
+      } else {
+        setNoStudentsError(null);
+      }
+    }
+  }, [selectedPeriod, periods]);
 
   // Handle loading state
   if (isPeriodLoading) {
@@ -122,6 +141,20 @@ export default function AIReportPage() {
   const handleSendMessage = async (message: string) => {
     if (!userId || isLoading || !selectedPeriod) return;
 
+    // Check if selected period has students
+    const period = periods.find((p) => p.id_periode === selectedPeriod);
+    if (period && period._count?.mahasiswa === 0) {
+      toast.error(
+        <div className="flex flex-col gap-2">
+          <p>Periode ini belum memiliki data mahasiswa</p>
+          <Button asChild variant="outline" size="sm">
+            <Link href="/manage">Tambah Data Mahasiswa</Link>
+          </Button>
+        </div>
+      );
+      return;
+    }
+
     setIsLoading(true);
     try {
       const response = await fetch("/api/ai-report", {
@@ -158,6 +191,7 @@ export default function AIReportPage() {
       }
     } catch (error) {
       console.error("Error sending message:", error);
+      toast.error("Gagal mengirim pesan. Silakan coba lagi.");
     } finally {
       setIsLoading(false);
     }
@@ -174,10 +208,33 @@ export default function AIReportPage() {
     setCurrentSession(null);
   };
 
+  const handleDeleteSession = async (sessionId: string) => {
+    try {
+      const response = await fetch(`/api/ai-report?sessionId=${sessionId}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete session");
+      }
+
+      // Remove session from state
+      setSessions(sessions.filter((s) => s.id !== sessionId));
+
+      // If current session is deleted, clear it
+      if (currentSession?.id === sessionId) {
+        setCurrentSession(null);
+      }
+    } catch (error) {
+      console.error("Error deleting session:", error);
+      toast.error("Gagal menghapus sesi. Silakan coba lagi.");
+    }
+  };
+
   return (
     <div className="fixed inset-0 flex flex-col overflow-hidden bg-background pt-16">
       {/* Header */}
-      <div className="flex items-center justify-end border-b p-4">
+      <div className="flex items-center justify-end p-4">
         <div className="flex items-center gap-4">
           <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
             <SelectTrigger className="w-[350px] max-w-full">
@@ -185,8 +242,13 @@ export default function AIReportPage() {
             </SelectTrigger>
             <SelectContent>
               {periods.map((period) => (
-                <SelectItem key={period.id_periode} value={period.id_periode}>
+                <SelectItem
+                  key={period.id_periode}
+                  value={period.id_periode}
+                  disabled={period._count?.mahasiswa === 0}
+                >
                   {`Periode ${period.id_periode} - Tahun ${period.tahun}`}
+                  {period._count?.mahasiswa === 0 && " (Belum ada data)"}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -196,6 +258,7 @@ export default function AIReportPage() {
             currentSessionId={currentSession?.id}
             onSelectSession={handleSelectSession}
             onNewSession={handleNewSession}
+            onDeleteSession={handleDeleteSession}
           />
           {currentSession && (
             <DownloadPDFButton
@@ -208,11 +271,26 @@ export default function AIReportPage() {
 
       {/* Chat Area */}
       <div className="flex-1 overflow-hidden">
-        <ChatContainer
-          messages={currentSession?.messages || []}
-          isLoading={isLoading}
-          onSendMessage={handleSendMessage}
-        />
+        {noStudentsError ? (
+          <div className="flex h-full flex-col items-center justify-center gap-4">
+            <h2 className="text-2xl font-semibold text-destructive">
+              {noStudentsError}
+            </h2>
+            <p className="text-center text-muted-foreground">
+              Silakan tambahkan data mahasiswa terlebih dahulu untuk menggunakan
+              fitur AI Report
+            </p>
+            <Button asChild>
+              <Link href="/manage">Tambah Data Mahasiswa</Link>
+            </Button>
+          </div>
+        ) : (
+          <ChatContainer
+            messages={currentSession?.messages || []}
+            isLoading={isLoading}
+            onSendMessage={handleSendMessage}
+          />
+        )}
       </div>
     </div>
   );

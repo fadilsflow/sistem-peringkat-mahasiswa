@@ -1,11 +1,4 @@
 "use client";
-
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronUp } from "lucide-react";
@@ -77,7 +70,7 @@ export function ChatTemplates({ onSelectTemplate }: ChatTemplatesProps) {
           <ScrollArea className="w-full" type="always">
             <div className="flex  gap-3 pb-2">
               {templates.map((template) => (
-                <Card
+                <div
                   key={template.title}
                   className="w-[250px] cursor-pointer shrink-0 transition-colors hover:bg-muted/50"
                   onClick={() => {
@@ -85,13 +78,11 @@ export function ChatTemplates({ onSelectTemplate }: ChatTemplatesProps) {
                     setIsExpanded(false);
                   }}
                 >
-                  <CardHeader className="p-4">
-                    <CardTitle className="text-sm">{template.title}</CardTitle>
-                    <CardDescription className="text-xs">
-                      {template.description}
-                    </CardDescription>
-                  </CardHeader>
-                </Card>
+                  <div className="p-4">
+                    <p className="text-xs">{template.title}</p>
+                    <p className="text-[10px]">{template.description}</p>
+                  </div>
+                </div>
               ))}
             </div>
             <ScrollBar orientation="horizontal" />

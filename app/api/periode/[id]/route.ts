@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { userId } = await auth();
@@ -12,9 +12,11 @@ export async function GET(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const { id } = await params;
+
     const periode = await prisma.periode.findFirst({
       where: {
-        id_periode: params.id,
+        id_periode: id,
         userId: userId,
       },
     });

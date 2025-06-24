@@ -35,16 +35,28 @@ export interface CsvMahasiswa {
 export function validateCsvData(data: CsvMahasiswa[]): {
   isValid: boolean;
   errors: string[];
-  validData: Omit<
-    Mahasiswa,
-    "id_periode" | "periodeId_periode" | "tanggal_input" | "Periode"
-  >[];
+  validData: {
+    nim: string;
+    nama: string;
+    nilai_akademik: number;
+    kehadiran: number;
+    prestasi_akademik: number;
+    prestasi_nonakademik: number;
+    perilaku: number;
+    keaktifan_organisasi: number;
+  }[];
 } {
   const errors: string[] = [];
-  const validData: Omit<
-    Mahasiswa,
-    "id_periode" | "periodeId_periode" | "tanggal_input" | "Periode"
-  >[] = [];
+  const validData: {
+    nim: string;
+    nama: string;
+    nilai_akademik: number;
+    kehadiran: number;
+    prestasi_akademik: number;
+    prestasi_nonakademik: number;
+    perilaku: number;
+    keaktifan_organisasi: number;
+  }[] = [];
 
   data.forEach((row, index) => {
     const rowNumber = index + 2; // +2 because of header row and 0-based index

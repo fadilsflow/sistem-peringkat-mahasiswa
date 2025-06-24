@@ -37,7 +37,7 @@ export function ChatContainer({
       {/* Messages Area */}
       <div className="flex-1 overflow-y-auto p-4">
         <div className="mx-auto max-w-4xl space-y-4">
-          {messages.length === 0 ? (
+          {messages.length === 0 && !isLoading ? (
             <div className="flex h-full items-center justify-center">
               <p className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-3xl font-medium text-primary text-center">
                 Analisa data mahasiswa dengan AI
@@ -65,8 +65,8 @@ export function ChatContainer({
       </div>
 
       {/* Input Area */}
-      <div className="border-t bg-background p-4">
-        <div className="mx-auto max-w-4xl">
+      <div className=" p-4">
+        <div className="mx-auto max-w-2xl">
           <ChatInput onSend={onSendMessage} isLoading={isLoading} />
         </div>
       </div>
