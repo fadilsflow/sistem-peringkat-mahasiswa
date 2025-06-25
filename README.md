@@ -5,7 +5,7 @@
   
   <h3>Sistem Peringkat Mahasiswa dengan Metode SAW</h3>
 
-  <p>Platform modern untuk mengelola dan mengevaluasi prestasi akademik mahasiswa menggunakan metode Simple Additive Weighting (SAW)</p>
+  <p>SyncRank adalah aplikasi web modern yang dirancang untuk menyederhanakan proses evaluasi dan peringkat mahasiswa. Dengan memanfaatkan metode Simple Additive Weighting (SAW), SyncRank memberikan solusi yang efisien, akurat, dan mudah digunakan bagi institusi pendidikan.</p>
 
   <p>
     <a href="https://syncrank.bulba.cloud">View Demo</a>
@@ -18,16 +18,17 @@
 
 ## ✨ Features
 
-- 📊 **Dashboard Interaktif** - Visualisasi data dan statistik mahasiswa
-- 🎯 **Manajemen Periode** - Atur periode dan bobot kriteria penilaian
-- 👥 **Manajemen Mahasiswa** - Kelola data dan nilai mahasiswa
-- 📈 **Perhitungan SAW** - Evaluasi otomatis menggunakan metode SAW
-- 🔒 **Autentikasi** - Keamanan data dengan Clerk Auth
-- 🎨 **UI Modern** - Antarmuka yang intuitif dengan Shadcn/ui
+- ✨ **UI Modern & Intuitif**: Antarmuka bersih yang dibangun dengan Next.js 14, Shadcn/ui, dan Tailwind CSS untuk pengalaman pengguna terbaik.
+- 🚀 **Performa Cepat**: Dioptimalkan untuk kecepatan, termasuk proses impor data mahasiswa secara massal yang efisien untuk menangani volume data besar.
+- 📊 **Dashboard Analitik**: Visualisasikan peringkat dan data mahasiswa secara real-time untuk pengambilan keputusan yang lebih baik.
+- ⚙️ **Manajemen Fleksibel**: Kelola data mahasiswa dan periode penilaian dengan mudah. Atur bobot kriteria SAW sesuai kebutuhan institusi Anda.
+- 📈 **Peringkat Otomatis**: Perhitungan peringkat mahasiswa yang akurat dan otomatis menggunakan metode Simple Additive Weighting (SAW).
+- 🔒 **Aman & Terpercaya**: Sistem autentikasi yang aman menggunakan Clerk untuk melindungi data.
+- 📤 **Ekspor ke Excel**: Ekspor hasil peringkat mahasiswa ke dalam format Excel dengan sekali klik.
 
 ## 🛠️ Tech Stack
 
-- [Next.js 14](https://nextjs.org/) - Framework React
+- [Next.js 15](https://nextjs.org/) - Framework React
 - [Prisma](https://www.prisma.io/) - ORM
 - [PostgreSQL](https://www.postgresql.org/) - Database
 - [Shadcn/ui](https://ui.shadcn.com/) - Komponen UI

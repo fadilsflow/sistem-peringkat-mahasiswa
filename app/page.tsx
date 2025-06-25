@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
-import HeroSectionOne from "@/components/ui/hero";
+import Hero from "@/components/ui/hero";
 import FeaturesSection from "@/components/ui/features-section";
-import CTA from "@/components/shared/cta";
+import HowItWorks from "@/components/ui/how-it-works";
+import Cta from "@/components/ui/cta";
 import { JsonLd } from "@/components/shared/json-ld";
 
 export const metadata: Metadata = {
@@ -41,7 +42,7 @@ export default function Home() {
       />
       <div className="min-h-screen">
         {/* Hero Section */}
-        <HeroSectionOne />
+        <Hero />
 
         {/* Features Section */}
         <div className="container mx-auto">
@@ -57,7 +58,8 @@ export default function Home() {
           </div>
           <FeaturesSection />
         </div>
-        <CTA />
+        <HowItWorks />
+        <Cta />
       </div>
     </>
   );

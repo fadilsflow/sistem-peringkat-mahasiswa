@@ -31,14 +31,20 @@ export function Header() {
             transition={{ duration: 0.2 }}
             className="flex items-center gap-6"
           >
-            <Link href="/" className="flex items-center text-primary">
+            <Link
+              href="/"
+              className="flex items-center text-primary transform transition-all duration-300 hover:-translate-y-0.5"
+            >
               <span className="font-bold">SYNCRANK</span>
             </Link>
           </motion.div>
           <div className="flex gap-4 items-center">
             <SignedOut>
               <SignInButton mode="modal">
-                <Button size="sm" className="text-sm bg-primary">
+                <Button
+                  size="sm"
+                  className="text-sm bg-primary transform transition-all duration-300 hover:-translate-y-0.5"
+                >
                   Login
                 </Button>
               </SignInButton>
@@ -46,7 +52,11 @@ export function Header() {
 
             <SignedIn>
               {isHome ? (
-                <Button size="sm" className="text-sm" asChild>  
+                <Button
+                  size="sm"
+                  className="text-sm transform transition-all duration-300 hover:-translate-y-0.5"
+                  asChild
+                >
                   <Link href="/dashboard">Dashboard</Link>
                 </Button>
               ) : (
@@ -57,7 +67,7 @@ export function Header() {
                       href={item.href}
                       className={` px-2 md:px-3 py-2 md:py-3.5  text-[10px] md:text-sm font-light transition-colors text-primary hover:text-primary hover:bg-muted/50 ${
                         pathname === item.href
-                          ? " text-primary border-b-2 border-primary"
+                          ? " text-primary border-b-2 border-primary transform transition-all duration-300 hover:-translate-y-0.5"
                           : ""
                       }`}
                     >
@@ -66,9 +76,19 @@ export function Header() {
                   ))}
                 </nav>
               )}
-              <UserButton />
+
+              <UserButton
+                appearance={{
+                  elements: {
+                    userButtonPopoverCard: "bg-background",
+                    userButtonPopoverCardHeader: "bg-background",
+                    userButtonPopoverCardContent: "bg-background",
+                    userButtonPopoverCardFooter: "bg-background",
+                  },
+                }}
+              />
             </SignedIn>
-            <ModeToggle/>
+            <ModeToggle />
           </div>
         </div>
       </div>

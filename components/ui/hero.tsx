@@ -19,15 +19,15 @@ export default function Hero() {
             transition={{ duration: 0.3, delay: 0.2 }}
           >
             <Badge variant="outline" className="text-primary">
-              <Sparkles className="h-3 w-3 sm:h-4 sm:w-4" />{" "}
-              <span className="text-xs sm:text-sm font-bold">
-                Evaluasi Prestasi Akademik dengan AI
+              <Sparkles className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />{" "}
+              <span className="text-xs sm:text-sm font-medium">
+                Didukung Metode SAW & Analisis AI
               </span>
             </Badge>
           </motion.div>
         </div>
-        <h1 className="z-10 text-center max-w-[280px] xs:max-w-sm sm:max-w-xl lg:max-w-2xl mx-auto text-xl sm:text-2xl md:text-3xl lg:text-5xl font-medium text-primary">
-          {"Platform Peringkat Mahasiswa yang Cerdas"
+        <h1 className="z-10 text-center max-w-[400px] xs:max-w-xl   sm:max-2w-xl lg:max-w-3xl mx-auto text-xl sm:text-2xl md:text-3xl lg:text-5xl font-medium text-primary">
+          {"Peringkat Mahasiswa Objektif, Rekomendasi Jadi Solutif"
             .split(" ")
             .map((word, index) => (
               <motion.span
@@ -51,9 +51,9 @@ export default function Hero() {
           transition={{ duration: 0.3, delay: 0.8 }}
           className="relative z-10 py-3 sm:py-4 text-center text-sm sm:text-base md:text-lg text-primary max-w-xs sm:max-w-sm md:max-w-xl mx-auto"
         >
-          Evaluasi prestasi akademik jadi lebih mudah dengan metode SAW dan
-          bantuan AI. Dapatkan insight yang akurat dan rekomendasi yang tepat
-          untuk setiap mahasiswa.
+          SyncRank membantu Anda mengubah data akademik menjadi keputusan
+          strategis. Dengan metode SAW yang adil dan wawasan dari AI, evaluasi
+          prestasi menjadi lebih transparan dan mudah.
         </motion.p>
         <motion.div
           initial={{ opacity: 0 }}

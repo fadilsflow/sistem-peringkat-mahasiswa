@@ -11,39 +11,39 @@ import {
 export default function FeaturesSection() {
   const features = [
     {
-      title: "Analisis dengan SAW & AI",
+      title: "Analisis SAW & AI",
       description:
-        "Kombinasi metode SAW (Simple Additive Weighting) dengan AI untuk hasil yang lebih akurat. Dapatkan rekomendasi yang tepat sasaran untuk pengembangan akademik mahasiswa.",
+        "Dapatkan hasil peringkat yang adil dengan metode SAW dan manfaatkan rekomendasi cerdas dari AI untuk pengembangan potensi setiap mahasiswa.",
       icon: <Brain className="w-6 h-6" />,
     },
     {
-      title: "Manajemen Data Modern",
+      title: "Data Terpusat & Intuitif",
       description:
-        "Kelola data akademik dengan gaya yang kekinian. Nilai, kehadiran, prestasi, dan aktivitas organisasi - semuanya terintegrasi dalam satu dashboard yang keren.",
+        "Kumpulkan semua data penting—mulai dari nilai, kehadiran, hingga prestasi—dalam satu platform yang dirancang untuk kemudahan akses dan pengelolaan.",
       icon: <Users className="w-6 h-6" />,
     },
     {
-      title: "Periode Super Fleksibel",
+      title: "Periode Penilaian Fleksibel",
       description:
-        "Atur periode sesuka hati! Sesuaikan bobot penilaian dan kriteria dengan mudah untuk setiap semester. Dijamin gak ribet dan bikin happy para dosen.",
+        "Sesuaikan bobot dan kriteria penilaian untuk setiap semester atau tahun ajaran. Atur dengan mudah tanpa mengubah struktur data utama.",
       icon: <Calendar className="w-6 h-6" />,
     },
     {
-      title: "Perhitungan Otomatis",
+      title: "Peringkat Real-time",
       description:
-        "Gak perlu pusing hitung manual! Sistem langsung menghitung peringkat pakai metode SAW yang akurat. Tinggal klik, hasilnya langsung keluar.",
+        "Lupakan spreadsheet dan perhitungan manual. SyncRank mengolah data secara otomatis dan menyajikan peringkat mahasiswa secara instan.",
       icon: <Calculator className="w-6 h-6" />,
     },
     {
-      title: "Dashboard Keren",
+      title: "Dashboard Interaktif",
       description:
-        "Interface modern yang bikin mata happy! Lihat semua data penting dalam sekali pandang dengan tampilan yang fresh dan mudah dipahami.",
+        "Visualisasikan data, pantau tren performa, dan identifikasi mahasiswa berprestasi melalui dashboard yang informatif dan mudah digunakan.",
       icon: <BarChart3 className="w-6 h-6" />,
     },
     {
-      title: "Keamanan Maksimal",
+      title: "Aman dan Terpercaya",
       description:
-        "Data aman? Pasti dong! Dilengkapi sistem autentikasi canggih dan enkripsi data. Privasi dan keamanan informasi akademik jadi prioritas utama.",
+        "Dibangun dengan standar keamanan terdepan dan sistem autentikasi modern untuk memastikan data akademik institusi Anda selalu terjaga.",
       icon: <Shield className="w-6 h-6" />,
     },
   ];

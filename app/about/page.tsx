@@ -6,13 +6,13 @@ import { JsonLd } from "@/components/shared/json-ld";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "About SyncRank",
+  title: "Tentang SyncRank",
   description:
-    "Pelajari lebih lanjut tentang SyncRank, sistem peringkat mahasiswa yang menggunakan metode SAW untuk evaluasi yang akurat dan transparan.",
+    "Cerita di balik SyncRank, platform evaluasi mahasiswa yang mentransformasi data menjadi wawasan untuk pengembangan akademik.",
   openGraph: {
-    title: "About SyncRank",
+    title: "Tentang SyncRank",
     description:
-      "Pelajari lebih lanjut tentang SyncRank, sistem peringkat mahasiswa yang menggunakan metode SAW untuk evaluasi yang akurat dan transparan.",
+      "Cerita di balik SyncRank, platform evaluasi mahasiswa yang mentransformasi data menjadi wawasan untuk pengembangan akademik.",
   },
 };
 
@@ -23,8 +23,9 @@ export default function About() {
         data={{
           "@context": "https://schema.org",
           "@type": "AboutPage",
-          name: "About SyncRank",
-          description: "Informasi tentang SyncRank dan tim pengembang",
+          name: "Tentang SyncRank",
+          description:
+            "Cerita di balik SyncRank dan misinya untuk evaluasi akademik yang lebih baik.",
           publisher: {
             "@type": "Organization",
             name: "SyncRank",
@@ -36,33 +37,36 @@ export default function About() {
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto">
             <div className="prose prose-zinc dark:prose-invert">
-              <h1 className="text-4xl font-bold mb-6">About SyncRank</h1>
-              <p className="text-primary-50 leading-relaxed">
-                SYNCRANK adalah platform inovatif yang dirancang untuk membantu
-                institusi pendidikan dalam mengelola dan mengevaluasi prestasi
-                akademik mahasiswa. Menggunakan metode SAW (Simple Additive
-                Weighting), kami menyediakan sistem penilaian yang objektif dan
-                transparan.
+              <h1 className="text-4xl font-medium text-center mb-6">
+                Cerita di Balik SyncRank
+              </h1>
+              <p className="text-primary-50 leading-relaxed text-justify">
+                SyncRank lahir dari sebuah gagasan sederhana: bagaimana jika
+                evaluasi prestasi mahasiswa tidak hanya berhenti pada angka,
+                tetapi menjadi awal dari pengembangan potensi mereka? Kami
+                percaya bahwa setiap data akademik memiliki cerita dan wawasan
+                berharga jika diolah dengan benar.
               </p>
 
-              <h2 className="text-2xl mt-8 mb-4">Our Mission</h2>
-              <p className="text-primary-50 leading-relaxed">
-                Misi kami adalah menyederhanakan proses evaluasi akademik sambil
-                memastikan keadilan dan transparansi dalam penilaian. Dengan
-                menggunakan teknologi terkini dan metode yang terpercaya, kami
-                membantu institusi pendidikan membuat keputusan yang lebih baik
-                dalam pengembangan akademik mahasiswa.
+              <h2 className="text-2xl font-medium text-center mt-8 mb-4">
+                Misi Kami
+              </h2>
+              <p className="text-primary-50 leading-relaxed text-justify">
+                Misi kami adalah memberdayakan institusi pendidikan dengan alat
+                yang adil, transparan, dan cerdas. Kami menggabungkan metode SAW
+                (Simple Additive Weighting) yang telah teruji dengan kekuatan
+                analisis AI untuk menyajikan peringkat yang objektif dan
+                rekomendasi yang dapat ditindaklanjuti.
               </p>
 
-              <p className="text-primary-50 leading-relaxed">
-                Kami berkomitmen untuk terus mengembangkan dan meningkatkan
-                platform ini sesuai dengan kebutuhan pengguna. Dengan fokus pada
-                keamanan data dan kemudahan penggunaan, SYNCRANK bertujuan
-                menjadi solusi terpercaya untuk manajemen peringkat akademik di
-                institusi pendidikan tinggi.
+              <p className="text-primary-50 leading-relaxed text-justify">
+                Kami berkomitmen pada kemudahan penggunaan dan keamanan data.
+                SyncRank dirancang untuk menjadi partner Anda dalam membuat
+                keputusan berbasis data, membantu setiap mahasiswa mencapai
+                potensi terbaiknya.
               </p>
 
-              <h2 className="text-2xl mt-8 mb-4">Contact</h2>
+              <h2 className="text-2xl mt-8 mb-4">Kontak</h2>
               <div className="flex items-center gap-4 mt-4">
                 <Button variant="outline" size="sm" asChild>
                   <Link href="https://fadils.xyz" target="_blank">
