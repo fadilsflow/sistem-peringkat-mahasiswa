@@ -13,37 +13,37 @@ export default function FeaturesSection() {
     {
       title: "Analisis SAW & AI",
       description:
-        "Dapatkan hasil peringkat yang adil dengan metode SAW dan manfaatkan rekomendasi cerdas dari AI untuk pengembangan potensi setiap mahasiswa.",
+        "Kombinasikan keadilan metode SAW dengan kecerdasan AI. Dapatkan peringkat objektif dan rekomendasi personal untuk memaksimalkan potensi setiap mahasiswa.",
       icon: <Brain className="w-6 h-6" />,
     },
     {
-      title: "Data Terpusat & Intuitif",
+      title: "Manajemen Data Efisien",
       description:
-        "Kumpulkan semua data penting—mulai dari nilai, kehadiran, hingga prestasi—dalam satu platform yang dirancang untuk kemudahan akses dan pengelolaan.",
+        "Kelola data mahasiswa dan kriteria dengan mudah. Dukungan impor & ekspor Excel mempercepat alur kerja Anda, membebaskan waktu dari entri data manual.",
       icon: <Users className="w-6 h-6" />,
     },
     {
       title: "Periode Penilaian Fleksibel",
       description:
-        "Sesuaikan bobot dan kriteria penilaian untuk setiap semester atau tahun ajaran. Atur dengan mudah tanpa mengubah struktur data utama.",
+        "Atur bobot dan kriteria penilaian yang berbeda untuk setiap periode. Fleksibilitas penuh untuk beradaptasi dengan kebutuhan akademik tanpa mengubah data inti.",
       icon: <Calendar className="w-6 h-6" />,
     },
     {
       title: "Peringkat Real-time",
       description:
-        "Lupakan spreadsheet dan perhitungan manual. SyncRank mengolah data secara otomatis dan menyajikan peringkat mahasiswa secara instan.",
+        "Tinggalkan spreadsheet dan perhitungan manual. SyncRank mengolah data secara otomatis untuk menyajikan peringkat mahasiswa yang selalu ter-update secara instan.",
       icon: <Calculator className="w-6 h-6" />,
     },
     {
       title: "Dashboard Interaktif",
       description:
-        "Visualisasikan data, pantau tren performa, dan identifikasi mahasiswa berprestasi melalui dashboard yang informatif dan mudah digunakan.",
+        "Pantau tren performa, visualisasikan data, dan temukan mahasiswa berprestasi dengan cepat melalui dashboard interaktif yang dirancang untuk kemudahan analisis.",
       icon: <BarChart3 className="w-6 h-6" />,
     },
     {
       title: "Aman dan Terpercaya",
       description:
-        "Dibangun dengan standar keamanan terdepan dan sistem autentikasi modern untuk memastikan data akademik institusi Anda selalu terjaga.",
+        "Keamanan data Anda adalah prioritas. Kami menggunakan sistem autentikasi modern dan standar keamanan terdepan untuk melindungi informasi akademik institusi Anda.",
       icon: <Shield className="w-6 h-6" />,
     },
   ];

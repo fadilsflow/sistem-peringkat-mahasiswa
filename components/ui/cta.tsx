@@ -4,9 +4,9 @@ import Link from "next/link";
 
 export default function Cta() {
   return (
-    <div className="border rounded-lg   border-primary">
+    <div>
       <div className="mx-auto max-w-4xl py-12 px-4 text-center sm:px-6 lg:py-16 lg:px-8">
-        <h2 className="text-3xl font-bold tracking-tight text-primary sm:text-4xl">
+        <h2 className="text-3xl font-light tracking-tight text-primary sm:text-4xl">
           <span className="block">Siap Mengubah Data Menjadi Aksi?</span>
         </h2>
         <p className="mt-4 text-lg leading-6 text-primary">

@@ -21,6 +21,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { cn } from "@/lib/utils";
 
 interface Session {
   id: string;
@@ -98,16 +99,19 @@ export function SessionDialog({
                     className="group relative flex items-center gap-2"
                   >
                     <Button
-                      variant={
-                        currentSessionId === session.id ? "default" : "ghost"
-                      }
-                      className="flex w-full flex-col items-start gap-1 p-3"
+                      variant="ghost"
+                      className={cn(
+                        "flex w-full flex-col items-start gap-1 p-3",
+                        currentSessionId === session.id
+                          ? "border border-primary bg-primary text-primary-foreground "
+                          : "bg-background text-foreground border border-primary"
+                      )}
                       onClick={() => handleSelectSession(session.id)}
                     >
                       <span className="line-clamp-1 text-left font-medium">
                         {session.title}
                       </span>
-                      <span className="text-xs text-muted-foreground">
+                      <span className="text-xs ">
                         {new Date(session.createdAt).toLocaleDateString(
                           "id-ID",
                           {

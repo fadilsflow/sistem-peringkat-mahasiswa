@@ -20,8 +20,8 @@ export default function Hero() {
           >
             <Badge variant="outline" className="text-primary">
               <Sparkles className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />{" "}
-              <span className="text-xs sm:text-sm font-medium">
-                Didukung Metode SAW & Analisis AI
+              <span className="text-xs sm:text-sm font-medium text-primary">
+                AI-Powered
               </span>
             </Badge>
           </motion.div>
@@ -92,7 +92,7 @@ export default function Hero() {
         >
           <div className="w-full overflow-hidden rounded-xl border border-primary">
             <Image
-              src="https://res.cloudinary.com/dxurnpbrc/image/upload/v1750670899/syncrank-dashboard_sxgeqt.png"
+              src="https://res.cloudinary.com/dxurnpbrc/image/upload/v1750844369/syncrank-dashboard_sxgeqt.png"
               alt="Dashboard preview"
               className="aspect-[16/9] w-full object-cover"
               height={500}

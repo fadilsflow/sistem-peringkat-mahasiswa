@@ -6,6 +6,13 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { ModeToggle } from "./mode-togle";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Menu } from "lucide-react";
 
 export function Header() {
   const pathname = usePathname();
@@ -60,21 +67,42 @@ export function Header() {
                   <Link href="/dashboard">Dashboard</Link>
                 </Button>
               ) : (
-                <nav className="flex">
-                  {navItemsSignedIn.map((item) => (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      className={` px-2 md:px-3 py-2 md:py-3.5  text-[10px] md:text-sm font-light transition-colors text-primary hover:text-primary hover:bg-muted/50 ${
-                        pathname === item.href
-                          ? " text-primary border-b-2 border-primary transform transition-all duration-300 hover:-translate-y-0.5"
-                          : ""
-                      }`}
-                    >
-                      {item.label}
-                    </Link>
-                  ))}
-                </nav>
+                <>
+                  <nav className="hidden md:flex items-center space-x-2">
+                    {navItemsSignedIn.map((item) => (
+                      <Button
+                        key={item.href}
+                        asChild
+                        variant="ghost"
+                        className={cn(
+                          "text-sm font-medium",
+                          pathname === item.href
+                            ? "text-primary"
+                            : "text-muted-foreground"
+                        )}
+                      >
+                        <Link href={item.href}>{item.label}</Link>
+                      </Button>
+                    ))}
+                  </nav>
+                  <div className="md:hidden">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon">
+                          <Menu className="h-5 w-5" />
+                          <span className="sr-only">Buka menu</span>
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        {navItemsSignedIn.map((item) => (
+                          <DropdownMenuItem key={item.href} asChild>
+                            <Link href={item.href}>{item.label}</Link>
+                          </DropdownMenuItem>
+                        ))}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                </>
               )}
 
               <UserButton

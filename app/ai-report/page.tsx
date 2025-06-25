@@ -15,6 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { toast } from "sonner";
+import { Loader } from "lucide-react";
 
 interface Message {
   id: string;
@@ -101,7 +102,10 @@ export default function AIReportPage() {
   if (isPeriodLoading) {
     return (
       <div className="flex h-[calc(100vh-4rem)] items-center justify-center">
-        <p className="text-lg text-muted-foreground">Memuat data...</p>
+        <p className="text-lg text-muted-foreground  flex items-center gap-2">
+          <Loader className="w-6 h-6 animate-spin" />
+          Memuat data...
+        </p>
       </div>
     );
   }
@@ -235,10 +239,10 @@ export default function AIReportPage() {
   return (
     <div className="fixed inset-0 flex flex-col overflow-hidden bg-background pt-16">
       {/* Header */}
-      <div className="flex items-center justify-end p-4">
+      <div className="flex items-center max-w-7xl mx-auto ">
         <div className="flex items-center gap-4">
           <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
-            <SelectTrigger className="w-[350px] max-w-full">
+            <SelectTrigger className="w-[250px] max-w-full">
               <SelectValue placeholder="Pilih Periode" />
             </SelectTrigger>
             <SelectContent>

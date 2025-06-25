@@ -47,7 +47,7 @@ export function ChatBubble({ role, content, createdAt }: ChatBubbleProps) {
             })}
           </span>
         </div>
-        <div className="prose prose-sm dark:prose-invert max-w-none">
+        <div className="prose prose-sm dark:prose-invert max-w-none text-foreground">
           <ReactMarkdown>{content}</ReactMarkdown>
         </div>
       </div>

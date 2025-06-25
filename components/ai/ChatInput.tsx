@@ -57,7 +57,7 @@ export function ChatInput({ onSend, isLoading }: ChatInputProps) {
       <ChatTemplates onSelectTemplate={handleSelectTemplate} />
       <form
         onSubmit={handleSubmit}
-        className="relative flex items-end gap-2  bg-card text-foreground rounded-lg"
+        className="relative flex items-end gap-2  text-foreground rounded-lg bg-card"
       >
         <Textarea
           ref={textareaRef}
@@ -65,7 +65,7 @@ export function ChatInput({ onSend, isLoading }: ChatInputProps) {
           onChange={handleInput}
           onKeyDown={handleKeyDown}
           placeholder="Tanyakan tentang data mahasiswa... (Enter untuk kirim, Shift+Enter untuk baris baru)"
-          className="min-h-[52px] max-h-[200px] resize-none py-3 pr-12 text-foreground placeholder:text-foreground/50"
+          className="min-h-[52px] max-h-[200px] resize-none py-3 pr-12 text-foreground  placeholder:text-foreground/50"
           disabled={isLoading}
         />
         <Button

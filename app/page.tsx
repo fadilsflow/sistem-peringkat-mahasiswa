@@ -4,6 +4,8 @@ import FeaturesSection from "@/components/ui/features-section";
 import HowItWorks from "@/components/ui/how-it-works";
 import Cta from "@/components/ui/cta";
 import { JsonLd } from "@/components/shared/json-ld";
+import ManageDataPreview from "@/components/ui/manage-data-preview";
+import AiReportPreview from "@/components/ui/ai-report-preview";
 
 export const metadata: Metadata = {
   title: "SyncRank - Sistem Peringkat Mahasiswa dengan AI",
@@ -58,6 +60,8 @@ export default function Home() {
           </div>
           <FeaturesSection />
         </div>
+        <ManageDataPreview />
+        <AiReportPreview />
         <HowItWorks />
         <Cta />
       </div>

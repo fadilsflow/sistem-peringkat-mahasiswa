@@ -65,7 +65,7 @@ export function ChatContainer({
       </div>
 
       {/* Input Area */}
-      <div className=" p-4">
+      <div className=" p-4 ">
         <div className="mx-auto max-w-2xl">
           <ChatInput onSend={onSendMessage} isLoading={isLoading} />
         </div>

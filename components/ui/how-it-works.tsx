@@ -26,7 +26,8 @@ export default function HowItWorks() {
     <div className="bg-background py-12 sm:py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="text-center">
-          <h2 className="text-3xl font-bold text-primary sm:text-4xl">
+          
+          <h2 className="text-3xl font-light text-primary sm:text-4xl">
             Bagaimana SyncRank Bekerja?
           </h2>
           <p className="mx-auto mt-4 max-w-2xl text-lg text-primary">
@@ -41,7 +42,7 @@ export default function HowItWorks() {
               <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-primary text-background">
                 {step.icon}
               </div>
-              <h3 className="mt-6 text-xl font-bold text-primary">
+              <h3 className="mt-6 text-xl font-light text-primary">
                 {step.title}
               </h3>
               <p className="mt-2 text-base text-primary">{step.description}</p>

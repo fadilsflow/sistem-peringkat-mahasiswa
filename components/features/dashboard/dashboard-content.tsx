@@ -25,6 +25,7 @@ import {
   Award,
   Calendar,
   ArrowRight,
+  Loader,
 } from "lucide-react";
 import {
   Select,
@@ -82,9 +83,10 @@ export function DashboardContent() {
   if (isPeriodeLoading) {
     return (
       <div className="h-110 flex flex-col items-center justify-center gap-4">
-        <h1 className="animate-spin text-3xl sm:text-5xl font-bold tracking-tight text-primary">
-          Loading😭
-        </h1>
+        <p className="text-lg text-muted-foreground flex items-center gap-2">
+          <Loader className="w-6 h-6 animate-spin" />
+          Memuat data...
+        </p>
       </div>
     );
   }
