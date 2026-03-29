@@ -75,12 +75,6 @@ Untuk menjalankan proyek ini secara lokal, ikuti langkah-langkah berikut:
 
 Buka [http://localhost:3000](http://localhost:3000) di browser Anda untuk melihat hasilnya.
 
-## Rencana Pengembangan
-
-1.  **Kustomisasi Template Laporan**: Memungkinkan pengguna mendesain sendiri template laporan PDF.
-2.  **Analisis Perbandingan**: Fitur untuk membandingkan performa mahasiswa antar periode penilaian.
-3.  **Notifikasi**: Pengingat dan pemberitahuan penting untuk pengguna.
-4.  **Peran & Hak Akses**: Manajemen peran yang lebih detail (Admin, Dosen, Kepala Jurusan).
 
 ## Sumber Daya
 
