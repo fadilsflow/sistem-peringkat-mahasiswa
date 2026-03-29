@@ -91,6 +91,4 @@ Untuk pertanyaan, saran, atau peluang kolaborasi:
 - Email: [wahyufadil1140@gmail.com](mailto:wahyufadil1140@gmail.com)
 - GitHub: [@fadilsflow](https://github.com/fadilsflow)
 
-## Lisensi
-
-Proyek ini dilisensikan di bawah Lisensi MIT - lihat file [LICENSE](https://github.com/fadilsflow/sistem-peringkat-mahasiswa/blob/main/LICENSE) untuk detailnya.
+MIT [LICENSE](https://github.com/fadilsflow/sistem-peringkat-mahasiswa/blob/main/LICENSE) untuk detailnya.
